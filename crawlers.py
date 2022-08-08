@@ -233,3 +233,4 @@ class FacebookCarCrawler:
         browser.close()
         time.sleep(2)
         playwright.stop()
+
