@@ -12,13 +12,13 @@ from logger import stdout_log
 
 
 class FacebookCarCrawler:
-    def __init__(self, required_city: str, fb_bot_email: str, fb_bot_pass: str, strict_scroll: bool = False):
+    def __init__(self, required_city: str, fb_bot_email: str, fb_bot_pass: str, strict_scroll: str):
         self.cities_map = CITIES_MAP
         self.s3 = boto3.client('s3',
                                aws_access_key_id=AWS_ACCESS_KEY_ID,
                                aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
         self.required_city = required_city
-        self.strict_scroll = strict_scroll
+        self.strict_scroll = True if int(strict_scroll) else False
         self.fb_bot_email = fb_bot_email
         self.fb_bot_pass = fb_bot_pass
 
