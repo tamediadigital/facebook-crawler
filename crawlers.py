@@ -222,7 +222,7 @@ class FacebookCarCrawler:
                 file_path: str = f"test-facebook-{self.required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
 
             file = self._make_file_obj(parsed_items, file_path)
-            # self._upload_file_obj_to_s3(file)
+            self._upload_file_obj_to_s3(file)
 
             stdout_log.info(f"Crawling listings for {km_range}km range completed.")
             time.sleep(5)

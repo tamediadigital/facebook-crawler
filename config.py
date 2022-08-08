@@ -11,7 +11,7 @@ CITIES_MAP = {
     'luzern': 'Luzern, Switzerland'
     }
 
-CRAWLER_NAME = os.environ.get("CRAWLER_NAME")
+# CRAWLER_NAME = os.environ.get("CRAWLER_NAME")
 FB_BOT_CREDENTIALS_PAIR = os.environ.get("FB_BOT_CREDENTIALS_PAIR")
 CRAWL_TYPE = os.environ.get("CRAWL_TYPE")
 DATETIME = os.environ.get("DATETIME")

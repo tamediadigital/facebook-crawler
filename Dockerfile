@@ -10,4 +10,9 @@ RUN apt update && apt -y install libnss3 libasound2 libatspi2.0-0 libdrm2 libgbm
 
 COPY . .
 
-CMD ["python", "main.py"]
+RUN useradd  --uid 223344 facebook
+RUN chown -R facebook:facebook /facebook-crawler
+USER facebook
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["facebook-crawler/run_spiders.sh"]
