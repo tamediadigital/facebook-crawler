@@ -1,4 +1,5 @@
 #!/bin/bash
+set -eu
 echo $CRAWLER_NAME
 echo $CRAWL_TYPE
-python main.py
+python3 main.py
