@@ -37,31 +37,35 @@ class FacebookCarCrawler:
                 item_url_splited = item_url_raw.split("/?ref")
                 item_url = item_url_splited[0].strip()
                 item_id = item_url.split("item/")[1].strip()
+
+                item_data: list = item.select('div.aahdfvyu.fsotbgu8')
+                if not item_data:
+                    continue
+
+                item_price: str = item_data[0].text
+                item_short_desc: str = item_data[1].text if item_data[1].text else None
+                item_location: str = item_data[2].text
+                item_splited_location: list = item_location.split(',')
+                item_city: str = item_splited_location[0]
+                item_canton_code: str = item_splited_location[1].strip()
+                item_mileage: str = item_data[3].text if item_data[3].text else None
+
+                parsed_items.append({
+                                        "item_id": item_id,
+                                        "item_url": item_url,
+                                        "item_price": item_price,
+                                        "item_short_desc": item_short_desc,
+                                        "item_location": item_location,
+                                        "item_city": item_city,
+                                        "item_canton_code": item_canton_code,
+                                        "item_mileage": item_mileage
+                                        })
             except IndexError as e:
+                stdout_log.error(e)
                 continue
             except AttributeError as e:
+                stdout_log.error(e)
                 continue
-
-            item_data: list = item.select('div.aahdfvyu.fsotbgu8')
-            if not item_data:
-                continue
-
-            item_price: str = item_data[0].text
-            item_short_desc: str = item_data[1].text if item_data[1].text else None
-            item_location: str = item_data[2].text
-            item_splited_location: list = item_location.split(',')
-            item_city: str = item_splited_location[0]
-            item_canton_code: str = item_splited_location[1].strip()
-            item_mileage: str = item_data[3].text if item_data[3].text else None
-
-            parsed_items.append({"item_id": item_id,
-                                 "item_url": item_url,
-                                 "item_price": item_price,
-                                 "item_short_desc": item_short_desc,
-                                 "item_location": item_location,
-                                 "item_city": item_city,
-                                 "item_canton_code": item_canton_code,
-                                 "item_mileage": item_mileage})
 
         return parsed_items
 
@@ -88,26 +92,27 @@ class FacebookCarCrawler:
         browser = playwright.firefox.launch(headless=True)
         page = browser.new_page()
         page.goto("https://www.facebook.com/")
+        time.sleep(5)
         stdout_log.info("Init step completed.")
 
         # Log in step
         stdout_log.info("Log in step started.")
         page.fill("#email", self.fb_bot_email)
-        time.sleep(2)
+        time.sleep(3)
         page.fill("#pass", self.fb_bot_pass)
-        time.sleep(2)
+        time.sleep(3)
         page.click("button:text('Log In')")
-        time.sleep(10)
+        time.sleep(12)
         stdout_log.info("Log in step completed.")
 
         # Choose category step
         stdout_log.info("Choose category step started.")
         page.click("span:text('Marketplace')")
-        time.sleep(5)
+        time.sleep(7)
         page.click("span:text('Vehicles')")
-        time.sleep(5)
+        time.sleep(7)
         page.click("span:text('Cars')")
-        time.sleep(5)
+        time.sleep(7)
         stdout_log.info("Choose category step completed.")
 
         # Crawling listings per km range
@@ -135,17 +140,17 @@ class FacebookCarCrawler:
                     page.click('span:text("kilometres")')
                 else:
                     page.click('span:text("kilometre")')
-                time.sleep(3)
+                time.sleep(5)
 
                 page.fill("span:text('Location') + input", required_city)  # hardcoded
-                time.sleep(3)
+                time.sleep(5)
                 page.locator(f'ul li span:text("{required_city}") >> nth=0').click()
-                time.sleep(2)
+                time.sleep(5)
 
                 page.click('span:text("Change location")')
-                time.sleep(2)
-                page.click('span:text("Apply")')
                 time.sleep(5)
+                page.click('span:text("Apply")')
+                time.sleep(10)
 
             # Make starting point search to be from 1 km radius
             is_1km_range = False
@@ -155,14 +160,14 @@ class FacebookCarCrawler:
                     page.click('span:text("kilometres")')
                 else:
                     page.click('span:text("kilometre")')
-                time.sleep(2)
+                time.sleep(5)
 
                 page.click('span:text("kilometres") >> nth=1')
-                time.sleep(1)
+                time.sleep(2)
                 page.click('span:text("1 kilometre")')
-                time.sleep(1)
+                time.sleep(2)
                 page.click('span:text("Apply")')
-                time.sleep(4)
+                time.sleep(10)
                 is_1km_range = True
             elif '1 kilometre' in previous_search_km_range:
                 is_1km_range = True
@@ -187,7 +192,7 @@ class FacebookCarCrawler:
                 time.sleep(5)
 
                 page.click('span:text("Apply")')
-                time.sleep(10)
+                time.sleep(15)
 
             # Scroll step.
             stdout_log.info(f"Scroll step for {km_range}km range started.")
@@ -205,7 +210,7 @@ class FacebookCarCrawler:
 
                 page_height = page.evaluate('(window.innerHeight + window.scrollY)')
                 page.mouse.wheel(0, 15000)
-                time.sleep(4)
+                time.sleep(5)
                 page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
 
             stdout_log.info(f"Scroll step for {km_range}km range completed.")
