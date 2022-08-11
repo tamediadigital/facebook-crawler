@@ -197,41 +197,41 @@ class FacebookCarCrawler:
 
             # Scroll step.
             stdout_log.info(f"Scroll step for {km_range}km range started.")
-            page_height_after_scroll = 0
-            page_height = 1
-            while True:
-                stdout_log.info(f"Page height {page_height}")
-                if self.strict_scroll and len(BeautifulSoup(page.content(), 'html.parser').select(
-                        "div.l9j0dhe7.f9o22wc5.ad2k81qe")) > 1:
-                    page.mouse.wheel(0, 15000)
-                    break
-
-                if page_height == page_height_after_scroll:
-                    break
-
-                page_height = page.evaluate('(window.innerHeight + window.scrollY)')
-                page.mouse.wheel(0, 15000)
-                time.sleep(5)
-                page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
+            # page_height_after_scroll = 0
+            # page_height = 1
+            # while True:
+            #     stdout_log.info(f"Page height {page_height}")
+            #     if self.strict_scroll and len(BeautifulSoup(page.content(), 'html.parser').select(
+            #             "div.l9j0dhe7.f9o22wc5.ad2k81qe")) > 1:
+            #         page.mouse.wheel(0, 15000)
+            #         break
+            #
+            #     if page_height == page_height_after_scroll:
+            #         break
+            #
+            #     page_height = page.evaluate('(window.innerHeight + window.scrollY)')
+            #     page.mouse.wheel(0, 15000)
+            #     time.sleep(5)
+            #     page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
 
             stdout_log.info(f"Scroll step for {km_range}km range completed.")
 
             # Parse items
-            stdout_log.info(f"Parsing items step for {km_range}km range started.")
-            page_content: str = page.content()
-            parsed_items: list = self._parse_items(page_content)
-            stdout_log.info(f"Parsing items step for {km_range}km range completed.")
-
-            if self.strict_scroll:
-                file_path: str = f"test-facebook-{self.required_city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
-            else:
-                file_path: str = f"test-facebook-{self.required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
-
-            file = self._make_file_obj(parsed_items, file_path)
-            self._upload_file_obj_to_s3(file)
-
-            stdout_log.info(f"Crawling listings for {km_range}km range completed.")
-            time.sleep(5)
+            # stdout_log.info(f"Parsing items step for {km_range}km range started.")
+            # page_content: str = page.content()
+            # parsed_items: list = self._parse_items(page_content)
+            # stdout_log.info(f"Parsing items step for {km_range}km range completed.")
+            #
+            # if self.strict_scroll:
+            #     file_path: str = f"test-facebook-{self.required_city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+            # else:
+            #     file_path: str = f"test-facebook-{self.required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+            #
+            # file = self._make_file_obj(parsed_items, file_path)
+            # self._upload_file_obj_to_s3(file)
+            #
+            # stdout_log.info(f"Crawling listings for {km_range}km range completed.")
+            # time.sleep(5)
 
         time.sleep(5)
 
