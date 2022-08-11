@@ -102,17 +102,17 @@ class FacebookCarCrawler:
         page.fill("#pass", self.fb_bot_pass)
         time.sleep(3)
         page.click("button:text('Log In')")
-        time.sleep(12)
+        time.sleep(30)
         stdout_log.info("Log in step completed.")
 
         # Choose category step
         stdout_log.info("Choose category step started.")
         page.click("span:text('Marketplace')")
-        time.sleep(7)
+        time.sleep(20)
         page.click("span:text('Vehicles')")
-        time.sleep(7)
+        time.sleep(20)
         page.click("span:text('Cars')")
-        time.sleep(7)
+        time.sleep(20)
         stdout_log.info("Choose category step completed.")
 
         # Crawling listings per km range
