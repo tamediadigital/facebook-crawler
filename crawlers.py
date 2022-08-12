@@ -90,8 +90,7 @@ class FacebookCarCrawler:
         stdout_log.info("Init step started.")
         playwright = sync_playwright().start()
         browser = playwright.firefox.launch(headless=True)
-        incognito_browser = browser.new_context(ignore_https_errors=True)
-        page = incognito_browser.new_page()
+        page = browser.new_page()
         page.goto("https://www.facebook.com/")
         time.sleep(5)
         stdout_log.info("Init step completed.")
@@ -108,12 +107,21 @@ class FacebookCarCrawler:
 
         # Choose category step
         stdout_log.info("Choose category step started.")
-        page.click("span:text('Marketplace')")
-        time.sleep(20)
+        try:
+            page.click("span:text('Marketplace')")
+        except Exception as e:
+            stdout_log.info("No Marketplace button.", e)
+        finally:
+            try:
+                page.goto("https://www.facebook.com/marketplace")
+            except Exception as e:
+                stdout_log.info("Marketplace url unreachable", e)
+
+        time.sleep(15)
         page.click("span:text('Vehicles')")
-        time.sleep(20)
+        time.sleep(10)
         page.click("span:text('Cars')")
-        time.sleep(20)
+        time.sleep(10)
         stdout_log.info("Choose category step completed.")
 
         # Crawling listings per km range
