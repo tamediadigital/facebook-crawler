@@ -18,7 +18,8 @@ DATETIME = os.environ.get("DATETIME")
 
 # REQUIRED_RANGES_IN_KM = os.environ.get("REQUIRED_RANGES_IN_KM")
 REQUIRED_RANGES_IN_KM = [1, 2, 5, 10, 20, 40, 60]
-REQUIRED_CITY: str = os.environ.get("REQUIRED_CITY")
+# REQUIRED_CITY = os.environ.get("REQUIRED_CITY")
+REQUIRED_CITY: list = ['zurich', 'bern', 'lausanne', 'lugano', 'geneva', 'st_gallen', 'basel', 'luzern']
 STRICT_SCROLL: str = os.environ.get("STRICT_SCROLL")
 
 FB_BOT_EMAIL: str = os.environ.get(f"FB_BOT_EMAIL_{FB_BOT_CREDENTIALS_PAIR}")

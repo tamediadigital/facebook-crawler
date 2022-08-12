@@ -12,12 +12,12 @@ from logger import stdout_log
 
 
 class FacebookCarCrawler:
-    def __init__(self, required_city: str, fb_bot_email: str, fb_bot_pass: str, strict_scroll: str):
+    def __init__(self, required_cities: list, fb_bot_email: str, fb_bot_pass: str, strict_scroll: str):
         self.cities_map = CITIES_MAP
         self.s3 = boto3.client('s3',
                                aws_access_key_id=AWS_ACCESS_KEY_ID,
                                aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-        self.required_city = required_city
+        self.required_cities = required_cities
         self.strict_scroll = True if int(strict_scroll) else False
         self.fb_bot_email = fb_bot_email
         self.fb_bot_pass = fb_bot_pass
@@ -124,124 +124,125 @@ class FacebookCarCrawler:
         time.sleep(10)
         stdout_log.info("Choose category step completed.")
 
-        # Crawling listings per km range
-        stdout_log.info("Crawling listings per km range step started.")
-        for idx, km_range in enumerate(REQUIRED_RANGES_IN_KM):
-            stdout_log.info(f"Crawling listings for {km_range}km range started.")
-            if idx in [0, 1]:
-                helper_locator_for_km_range = "kilometre"
-                locator_for_km_range = 'span:text("kilometre")'
-            else:
-                helper_locator_for_km_range = "kilometres"
-                locator_for_km_range = 'span:text("kilometres")'
-
-            # Detect previous search params
-            previous_radius_filter_text = page.locator('div#seo_filters').text_content()
-            previous_radius_filter_split_text: list = previous_radius_filter_text.split(' · ')
-            previous_search_city: str = previous_radius_filter_split_text[0].strip()
-            previous_search_km_range: str = previous_radius_filter_split_text[1].strip()
-
-            # Change city in search params if it is different from required
-            required_city: str = CITIES_MAP[self.required_city]
-            if previous_search_city != required_city:
-                stdout_log.info("Change city in search params if it is different from required step.")
-                if 'kilometres' in previous_search_km_range:
-                    page.click('span:text("kilometres")')
+        for required_city in self.required_cities:
+            # Crawling listings per km range
+            stdout_log.info("Crawling listings per km range step started.")
+            for idx, km_range in enumerate(REQUIRED_RANGES_IN_KM):
+                stdout_log.info(f"Crawling listings for {km_range}km range started.")
+                if idx in [0, 1]:
+                    helper_locator_for_km_range = "kilometre"
+                    locator_for_km_range = 'span:text("kilometre")'
                 else:
-                    page.click('span:text("kilometre")')
-                time.sleep(5)
+                    helper_locator_for_km_range = "kilometres"
+                    locator_for_km_range = 'span:text("kilometres")'
 
-                page.fill("span:text('Location') + input", required_city)  # hardcoded
-                time.sleep(5)
-                page.locator(f'ul li span:text("{required_city}") >> nth=0').click()
-                time.sleep(5)
+                # Detect previous search params
+                previous_radius_filter_text = page.locator('div#seo_filters').text_content()
+                previous_radius_filter_split_text: list = previous_radius_filter_text.split(' · ')
+                previous_search_city: str = previous_radius_filter_split_text[0].strip()
+                previous_search_km_range: str = previous_radius_filter_split_text[1].strip()
 
-                page.click('span:text("Change location")')
-                time.sleep(5)
-                page.click('span:text("Apply")')
-                time.sleep(10)
+                # Change city in search params if it is different from required
+                required_city: str = CITIES_MAP[required_city]
+                if previous_search_city != required_city:
+                    stdout_log.info("Change city in search params if it is different from required step.")
+                    if 'kilometres' in previous_search_km_range:
+                        page.click('span:text("kilometres")')
+                    else:
+                        page.click('span:text("kilometre")')
+                    time.sleep(5)
 
-            # Make starting point search to be from 1 km radius
-            is_1km_range = False
-            if 'kilometres' in previous_search_km_range and km_range == 1:
-                stdout_log.info("Make starting point search to be from 1 km radius step.")
-                if 'kilometres' in previous_search_km_range:
-                    page.click('span:text("kilometres")')
+                    page.fill("span:text('Location') + input", required_city)  # hardcoded
+                    time.sleep(5)
+                    page.locator(f'ul li span:text("{required_city}") >> nth=0').click()
+                    time.sleep(5)
+
+                    page.click('span:text("Change location")')
+                    time.sleep(5)
+                    page.click('span:text("Apply")')
+                    time.sleep(10)
+
+                # Make starting point search to be from 1 km radius
+                is_1km_range = False
+                if 'kilometres' in previous_search_km_range and km_range == 1:
+                    stdout_log.info("Make starting point search to be from 1 km radius step.")
+                    if 'kilometres' in previous_search_km_range:
+                        page.click('span:text("kilometres")')
+                    else:
+                        page.click('span:text("kilometre")')
+                    time.sleep(5)
+
+                    page.click('span:text("kilometres") >> nth=1')
+                    time.sleep(2)
+                    page.click('span:text("1 kilometre")')
+                    time.sleep(2)
+                    page.click('span:text("Apply")')
+                    time.sleep(10)
+                    is_1km_range = True
+                elif '1 kilometre' in previous_search_km_range:
+                    is_1km_range = True
+
+                # Step for changing km radius param for search.
+                # note: It starts from 1 km range so there is no point for setting it ones again to be 1 km.
+                if is_1km_range and km_range == 1:
+                    pass
                 else:
-                    page.click('span:text("kilometre")')
-                time.sleep(5)
+                    if 'kilometres' in previous_search_km_range:
+                        page.click('span:text("kilometres")')
+                    else:
+                        page.click('span:text("kilometre")')
+                    time.sleep(2)
 
-                page.click('span:text("kilometres") >> nth=1')
-                time.sleep(2)
-                page.click('span:text("1 kilometre")')
-                time.sleep(2)
-                page.click('span:text("Apply")')
-                time.sleep(10)
-                is_1km_range = True
-            elif '1 kilometre' in previous_search_km_range:
-                is_1km_range = True
+                    page.click(
+                        f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
+                    time.sleep(5)
 
-            # Step for changing km radius param for search.
-            # note: It starts from 1 km range so there is no point for setting it ones again to be 1 km.
-            if is_1km_range and km_range == 1:
-                pass
-            else:
-                if 'kilometres' in previous_search_km_range:
-                    page.click('span:text("kilometres")')
+                    page.click(
+                        f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0')
+                    time.sleep(5)
+
+                    page.click('span:text("Apply")')
+                    time.sleep(15)
+
+                # Scroll step.
+                stdout_log.info(f"Scroll step for {km_range}km range started.")
+                page_height_after_scroll = 0
+                page_height = 1
+                while True:
+                    stdout_log.info(f"Page height {page_height}")
+                    if self.strict_scroll and len(BeautifulSoup(page.content(), 'html.parser').select(
+                            "div.l9j0dhe7.f9o22wc5.ad2k81qe")) > 1:
+                        page.mouse.wheel(0, 15000)
+                        break
+
+                    if page_height == page_height_after_scroll:
+                        break
+
+                    page_height = page.evaluate('(window.innerHeight + window.scrollY)')
+                    page.mouse.wheel(0, 15000)
+                    time.sleep(5)
+                    page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
+
+                stdout_log.info(f"Scroll step for {km_range}km range completed.")
+
+                # Parse items
+                stdout_log.info(f"Parsing items step for {km_range}km range started.")
+                page_content: str = page.content()
+                parsed_items: list = self._parse_items(page_content)
+                stdout_log.info(f"Parsing items step for {km_range}km range completed.")
+
+                if self.strict_scroll:
+                    file_path: str = f"test-facebook-{required_city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
                 else:
-                    page.click('span:text("kilometre")')
-                time.sleep(2)
+                    file_path: str = f"test-facebook-{required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
 
-                page.click(
-                    f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
-                time.sleep(5)
+                file = self._make_file_obj(parsed_items, file_path)
+                self._upload_file_obj_to_s3(file)
 
-                page.click(
-                    f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0')
-                time.sleep(5)
-
-                page.click('span:text("Apply")')
+                stdout_log.info(f"Crawling listings for {km_range}km range completed.")
                 time.sleep(15)
 
-            # Scroll step.
-            stdout_log.info(f"Scroll step for {km_range}km range started.")
-            # page_height_after_scroll = 0
-            # page_height = 1
-            # while True:
-            #     stdout_log.info(f"Page height {page_height}")
-            #     if self.strict_scroll and len(BeautifulSoup(page.content(), 'html.parser').select(
-            #             "div.l9j0dhe7.f9o22wc5.ad2k81qe")) > 1:
-            #         page.mouse.wheel(0, 15000)
-            #         break
-            #
-            #     if page_height == page_height_after_scroll:
-            #         break
-            #
-            #     page_height = page.evaluate('(window.innerHeight + window.scrollY)')
-            #     page.mouse.wheel(0, 15000)
-            #     time.sleep(5)
-            #     page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
-
-            stdout_log.info(f"Scroll step for {km_range}km range completed.")
-
-            # Parse items
-            # stdout_log.info(f"Parsing items step for {km_range}km range started.")
-            # page_content: str = page.content()
-            # parsed_items: list = self._parse_items(page_content)
-            # stdout_log.info(f"Parsing items step for {km_range}km range completed.")
-            #
-            # if self.strict_scroll:
-            #     file_path: str = f"test-facebook-{self.required_city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
-            # else:
-            #     file_path: str = f"test-facebook-{self.required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
-            #
-            # file = self._make_file_obj(parsed_items, file_path)
-            # self._upload_file_obj_to_s3(file)
-            #
-            # stdout_log.info(f"Crawling listings for {km_range}km range completed.")
-            # time.sleep(5)
-
-        time.sleep(5)
+            time.sleep(5)
 
         page.close()
         browser.close()
