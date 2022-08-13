@@ -124,8 +124,9 @@ class FacebookCarCrawler:
         time.sleep(10)
         stdout_log.info("Choose category step completed.")
 
-        for required_city in self.required_cities:
+        for city in self.required_cities:
             # Crawling listings per km range
+            stdout_log.info(f"Scroll for {city} ranges started.")
             stdout_log.info("Crawling listings per km range step started.")
             for idx, km_range in enumerate(REQUIRED_RANGES_IN_KM):
                 stdout_log.info(f"Crawling listings for {km_range}km range started.")
@@ -143,7 +144,7 @@ class FacebookCarCrawler:
                 previous_search_km_range: str = previous_radius_filter_split_text[1].strip()
 
                 # Change city in search params if it is different from required
-                required_city: str = CITIES_MAP[required_city]
+                required_city: str = CITIES_MAP[city]
                 if previous_search_city != required_city:
                     stdout_log.info("Change city in search params if it is different from required step.")
                     if 'kilometres' in previous_search_km_range:
@@ -232,9 +233,9 @@ class FacebookCarCrawler:
                 stdout_log.info(f"Parsing items step for {km_range}km range completed.")
 
                 if self.strict_scroll:
-                    file_path: str = f"test-facebook-{required_city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+                    file_path: str = f"test-facebook-{city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
                 else:
-                    file_path: str = f"test-facebook-{required_city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+                    file_path: str = f"test-facebook-{city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
 
                 file = self._make_file_obj(parsed_items, file_path)
                 self._upload_file_obj_to_s3(file)
