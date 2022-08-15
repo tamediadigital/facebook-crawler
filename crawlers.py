@@ -21,6 +21,7 @@ class FacebookCarCrawler:
         self.strict_scroll = True if int(strict_scroll) else False
         self.fb_bot_email = fb_bot_email
         self.fb_bot_pass = fb_bot_pass
+        self.date = datetime.now().date().strftime("%Y-%m-%d")
 
     @staticmethod
     def _parse_items(page_content: str):
@@ -82,8 +83,8 @@ class FacebookCarCrawler:
         return file
 
     def _upload_file_obj_to_s3(self, file_obj):
-        self.s3.upload_file(file_obj, S3_BUCKET, f'{S3_PREFIX}/{file_obj}')
-        stdout_log.info(f"File uploaded on s3. {S3_BUCKET}/{S3_PREFIX}/{file_obj}")
+        self.s3.upload_file(file_obj, S3_BUCKET, f'{S3_PREFIX}/{self.date}/{file_obj}')
+        stdout_log.info(f"File uploaded on s3. {S3_BUCKET}/{S3_PREFIX}/{self.date}/{file_obj}")
 
     def crawling_process(self):
         # Init browser, page and login step
@@ -233,9 +234,9 @@ class FacebookCarCrawler:
                 stdout_log.info(f"Parsing items step for {km_range}km range completed.")
 
                 if self.strict_scroll:
-                    file_path: str = f"test-facebook-{city}-strict-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+                    file_path: str = f"test-facebook-{city}-strict-range-{km_range}-km.jsonl.gz"
                 else:
-                    file_path: str = f"test-facebook-{city}-range-{km_range}-km-{str(datetime.now().date())}.jsonl.gz"
+                    file_path: str = f"test-facebook-{city}-range-{km_range}-km.jsonl.gz"
 
                 file = self._make_file_obj(parsed_items, file_path)
                 self._upload_file_obj_to_s3(file)
@@ -249,4 +250,3 @@ class FacebookCarCrawler:
         browser.close()
         time.sleep(2)
         playwright.stop()
-
