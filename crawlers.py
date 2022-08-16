@@ -129,10 +129,14 @@ class FacebookCarCrawler:
             page.goto("https://www.facebook.com/marketplace")
 
         time.sleep(10)
+
+        page_content_before_category = page.content()
+        stdout_log.info(f"Page content before category: {page_content_before_category}")
         page.click("span:text('Vehicles')")
         time.sleep(10)
         page.click("span:text('Cars')")
-        time.sleep(7)
+        time.sleep(10)
+
         stdout_log.info("Choose category step completed.")
 
         uncrawled_cities: list = self.required_cities

@@ -2,7 +2,7 @@ import json
 import redis
 import backoff
 
-from config_for_testing import REDIS_PORT, REDIS_HOST, REDIS_DB
+from config import REDIS_PORT, REDIS_HOST, REDIS_DB
 
 
 class Redis:
