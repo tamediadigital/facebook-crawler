@@ -103,7 +103,7 @@ class FacebookCarCrawler:
         # Init browser, page and login step
         stdout_log.info("Init step started.")
         playwright = sync_playwright().start()
-        browser = playwright.firefox.launch(headless=False)
+        browser = playwright.firefox.launch(headless=True)
         page = browser.new_page()
         page.goto("https://www.facebook.com/")
         time.sleep(5)
