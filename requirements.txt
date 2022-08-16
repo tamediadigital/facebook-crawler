@@ -1,3 +1,6 @@
 playwright
 beautifulsoup4
 boto3
+redis
+backoff
+iteration_utilities

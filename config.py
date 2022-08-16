@@ -29,3 +29,7 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 S3_BUCKET = os.environ.get("BUCKET_NAME")
 S3_PREFIX = os.environ.get("S3_PREFIX")
+
+REDIS_HOST: str = os.environ.get("REDIS_HOST")
+REDIS_PORT: int = int(os.environ.get("REDIS_PORT"))
+REDIS_DB: int = int(os.environ.get("REDIS_DB"))
