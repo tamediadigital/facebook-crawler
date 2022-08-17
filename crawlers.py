@@ -132,7 +132,7 @@ class FacebookCarCrawler:
 
         marketplace_img_path = f"marketplace_screenshot{self.fb_bot_email}.png"
         marketplace_img = page.screenshot(path=marketplace_img_path, full_page=True)
-        self.s3.upload_file(marketplace_img, S3_BUCKET, f'{S3_PREFIX}/{marketplace_img_path}')
+        self.s3.upload_file(marketplace_img_path, S3_BUCKET, f'{S3_PREFIX}/{marketplace_img_path}')
         page.click("span:text('Vehicles')")
         time.sleep(10)
         page.click("span:text('Cars')")
