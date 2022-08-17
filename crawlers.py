@@ -119,6 +119,10 @@ class FacebookCarCrawler:
         time.sleep(20)
         stdout_log.info("Log in step completed.")
 
+        login_img_path = f"login_img_path_screenshot{self.fb_bot_email}.png"
+        login_img = page.screenshot(path=login_img_path, full_page=True)
+        self.s3.upload_file(login_img_path, S3_BUCKET, f'{S3_PREFIX}/{login_img_path}')
+
         # Choose category step
         stdout_log.info("Choose category step started.")
         try:
