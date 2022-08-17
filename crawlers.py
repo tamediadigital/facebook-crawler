@@ -108,31 +108,18 @@ class FacebookCarCrawler:
         page.goto("https://www.facebook.com/")
         time.sleep(5)
         stdout_log.info("Init step completed.")
-        init_img_path = f"init_img_path_screenshot{self.fb_bot_email}.png"
-        init_img = page.screenshot(path=init_img_path, full_page=True)
-        self.s3.upload_file(init_img_path, S3_BUCKET, f'{S3_PREFIX}/{init_img_path}')
 
         # Log in step
         stdout_log.info("Log in step started.")
         page.fill("#email", self.fb_bot_email)
         time.sleep(5)
-        email_img_path = f"email_img_path_screenshot{self.fb_bot_email}.png"
-        email_img = page.screenshot(path=email_img_path, full_page=True)
-        self.s3.upload_file(email_img_path, S3_BUCKET, f'{S3_PREFIX}/{email_img_path}')
 
         page.fill("#pass", self.fb_bot_pass)
         time.sleep(5)
-        pass_img_path = f"pass_img_path_screenshot{self.fb_bot_email}.png"
-        pass_img = page.screenshot(path=pass_img_path, full_page=True)
-        self.s3.upload_file(pass_img_path, S3_BUCKET, f'{S3_PREFIX}/{pass_img_path}')
 
         page.click("button:text('Log In')")
         time.sleep(20)
         stdout_log.info("Log in step completed.")
-
-        login_img_path = f"login_img_path_screenshot{self.fb_bot_email}.png"
-        login_img = page.screenshot(path=login_img_path, full_page=True)
-        self.s3.upload_file(login_img_path, S3_BUCKET, f'{S3_PREFIX}/{login_img_path}')
 
         # Choose category step
         stdout_log.info("Choose category step started.")
@@ -281,7 +268,6 @@ class FacebookCarCrawler:
                 browser.close()
                 time.sleep(2)
                 playwright.stop()
-            finally:
                 raise TimeoutError()
 
         page.close()
