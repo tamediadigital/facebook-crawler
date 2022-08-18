@@ -217,7 +217,7 @@ class FacebookCarCrawler:
                             page.click('span:text("kilometres")')
                         else:
                             page.click('span:text("kilometre")')
-                        time.sleep(2)
+                        time.sleep(5)
 
                         page.click(
                             f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
