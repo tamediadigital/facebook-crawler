@@ -220,6 +220,9 @@ class FacebookCarCrawler:
                         time.sleep(10)
 
                         page.locator(
+                            f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}').wait_for(state="visible")
+
+                        page.locator(
                             f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}').click()
                         time.sleep(5)
 
