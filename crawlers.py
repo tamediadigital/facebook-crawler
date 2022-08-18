@@ -173,9 +173,9 @@ class FacebookCarCrawler:
                     if previous_search_city != required_city:
                         stdout_log.info("Change city in search params if it is different from required step.")
                         if 'kilometres' in previous_search_km_range:
-                            page.click('span:text("kilometres")')
+                            page.locator('span:text("kilometres")').click()
                         else:
-                            page.click('span:text("kilometre")')
+                            page.locator('span:text("kilometre")').click()
                         time.sleep(5)
 
                         page.fill("span:text('Location') + input", required_city)  # hardcoded
@@ -183,9 +183,9 @@ class FacebookCarCrawler:
                         page.locator(f'ul li span:text("{required_city}") >> nth=0').click()
                         time.sleep(5)
 
-                        page.click('span:text("Change location")')
+                        page.locator('span:text("Change location")').click()
                         time.sleep(5)
-                        page.click('span:text("Apply")')
+                        page.locator('span:text("Apply")').click()
                         time.sleep(10)
 
                     # Make starting point search to be from 1 km radius
@@ -219,24 +219,15 @@ class FacebookCarCrawler:
                             page.click('span:text("kilometre")')
                         time.sleep(10)
 
-                        try:
-                            page.click(
-                                f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
-                            time.sleep(5)
-                        except Exception as e:
-                            marketplace_img_path = f"line_222_screenshot{self.fb_bot_email}.png"
-                            marketplace_img = page.screenshot(path=marketplace_img_path, full_page=True)
-                            self.s3.upload_file(marketplace_img_path, S3_BUCKET, f'{S3_PREFIX}/{marketplace_img_path}')
-                            stdout_log.error(e)
-                            page.click(
-                                f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
-                            time.sleep(5)
-
-                        page.click(
-                            f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0')
+                        page.locator(
+                            f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}').click()
                         time.sleep(5)
 
-                        page.click('span:text("Apply")')
+                        page.locator(
+                            f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0').click()
+                        time.sleep(5)
+
+                        page.locator('span:text("Apply")').click()
                         time.sleep(15)
 
                     # Scroll step.
