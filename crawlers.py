@@ -217,11 +217,20 @@ class FacebookCarCrawler:
                             page.click('span:text("kilometres")')
                         else:
                             page.click('span:text("kilometre")')
-                        time.sleep(5)
+                        time.sleep(10)
 
-                        page.click(
-                            f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
-                        time.sleep(5)
+                        try:
+                            page.click(
+                                f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
+                            time.sleep(5)
+                        except Exception as e:
+                            marketplace_img_path = f"line_222_screenshot{self.fb_bot_email}.png"
+                            marketplace_img = page.screenshot(path=marketplace_img_path, full_page=True)
+                            self.s3.upload_file(marketplace_img_path, S3_BUCKET, f'{S3_PREFIX}/{marketplace_img_path}')
+                            stdout_log.error(e)
+                            page.click(
+                                f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
+                            time.sleep(5)
 
                         page.click(
                             f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0')
