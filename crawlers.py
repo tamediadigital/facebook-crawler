@@ -109,6 +109,14 @@ class FacebookCarCrawler:
         time.sleep(5)
         stdout_log.info("Init step completed.")
 
+        # Allow essential cookies step
+        try:
+            page.click("button:text('Only allow essential cookies')")
+            time.sleep(5)
+            stdout_log.info("Essential cookies step completed.")
+        except TimeoutError as e:
+            stdout_log.info(f"Button to allow essential cookies not found! {e}",)
+
         # Log in step
         stdout_log.info("Log in step started.")
         page.fill("#email", self.fb_bot_email)
@@ -131,10 +139,6 @@ class FacebookCarCrawler:
             page.goto("https://www.facebook.com/marketplace")
 
         time.sleep(10)
-
-        marketplace_img_path = f"marketplace_screenshot{self.fb_bot_email}.png"
-        marketplace_img = page.screenshot(path=marketplace_img_path, full_page=True)
-        self.s3.upload_file(marketplace_img_path, S3_BUCKET, f'{S3_PREFIX}/{marketplace_img_path}')
         page.click("span:text('Vehicles')")
         time.sleep(10)
         page.click("span:text('Cars')")
@@ -142,7 +146,7 @@ class FacebookCarCrawler:
 
         stdout_log.info("Choose category step completed.")
 
-        uncrawled_cities: list = self.required_cities
+        uncrawled_cities: list = self.required_cities.copy()
         for city in self.required_cities:
             parsed_items_for_city: list = []
             try:
