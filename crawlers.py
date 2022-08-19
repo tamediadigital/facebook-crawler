@@ -217,11 +217,9 @@ class FacebookCarCrawler:
                             page.click('span:text("kilometres")')
                         else:
                             page.click('span:text("kilometre")')
-                        time.sleep(10)
+                        time.sleep(7)
 
-                        page.wait_for_selector(f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}')
-                        page.locator(
-                            f'{locator_for_km_range} >> nth={"1" if helper_locator_for_km_range == "kilometre" or km_range > 2 else "0"}').click()
+                        page.locator("span:text('Radius') + div").click()
                         time.sleep(5)
 
                         page.locator(
@@ -259,7 +257,7 @@ class FacebookCarCrawler:
                     parsed_items_for_city.append(parsed_items)
                     stdout_log.info(f"Parsing items step for {km_range}km range completed.")
                     stdout_log.info(f"Crawling listings for {km_range}km range completed.")
-                    time.sleep(10)
+                    time.sleep(7)
 
                 file_path: str = f"test-facebook-{city}-{self.date}.jsonl.gz"
                 file = self._make_file_obj(parsed_items_for_city, file_path)
