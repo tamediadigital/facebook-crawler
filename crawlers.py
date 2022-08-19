@@ -215,19 +215,23 @@ class FacebookCarCrawler:
                     else:
                         if 'kilometres' in previous_search_km_range:
                             page.click('span:text("kilometres")')
+                            stdout_log.info("Line 217 completed")
                         else:
                             page.click('span:text("kilometre")')
+                            stdout_log.info("Line 220 completed")
                         time.sleep(7)
 
                         page.locator("span:text('Radius') + div").click()
-                        time.sleep(5)
+                        stdout_log.info("Line 224 span:text('Radius') + div completed")
+                        time.sleep(2)
 
                         page.locator(
                             f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0').click()
                         time.sleep(5)
+                        stdout_log.info(f'Line 228 span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0 + div completed')
 
                         page.locator('span:text("Apply")').click()
-                        time.sleep(15)
+                        time.sleep(10)
 
                     # Scroll step.
                     stdout_log.info(f"Scroll step for {km_range}km range started.")
