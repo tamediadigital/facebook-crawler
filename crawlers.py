@@ -110,12 +110,12 @@ class FacebookCarCrawler:
         stdout_log.info("Init step completed.")
 
         # Allow essential cookies step
-        try:
-            page.click("button:text('Only allow essential cookies')")
-            time.sleep(5)
-            stdout_log.info("Essential cookies step completed.")
-        except TimeoutError as e:
-            stdout_log.info(f"Button to allow essential cookies not found! {e}",)
+        # try:
+        #     page.click("button:text('Only allow essential cookies')")
+        #     time.sleep(5)
+        #     stdout_log.info("Essential cookies step completed.")
+        # except TimeoutError as e:
+        #     stdout_log.info(f"Button to allow essential cookies not found! {e}",)
 
         # Log in step
         stdout_log.info("Log in step started.")
