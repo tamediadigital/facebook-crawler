@@ -103,7 +103,7 @@ class FacebookCarCrawler:
         # Init browser, page and login step
         stdout_log.info("Init step started.")
         playwright = sync_playwright().start()
-        browser = playwright.firefox.launch(headless=True)
+        browser = playwright.chromium.launch(headless=True)
         page = browser.new_page()
         page.goto("https://www.facebook.com/")
         time.sleep(5)
@@ -223,7 +223,7 @@ class FacebookCarCrawler:
 
                         page.locator("span:text('Radius') + div").click()
                         stdout_log.info("Line 224 span:text('Radius') + div completed")
-                        time.sleep(2)
+                        time.sleep(5)
 
                         page.locator(
                             f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0').click()
