@@ -103,19 +103,19 @@ class FacebookCarCrawler:
         # Init browser, page and login step
         stdout_log.info("Init step started.")
         playwright = sync_playwright().start()
-        browser = playwright.chromium.launch(headless=True)
+        browser = playwright.firefox.launch(headless=True, timeout=60000)
         page = browser.new_page()
         page.goto("https://www.facebook.com/")
         time.sleep(5)
         stdout_log.info("Init step completed.")
 
         # Allow essential cookies step
-        # try:
-        #     page.click("button:text('Only allow essential cookies')")
-        #     time.sleep(5)
-        #     stdout_log.info("Essential cookies step completed.")
-        # except TimeoutError as e:
-        #     stdout_log.info(f"Button to allow essential cookies not found! {e}",)
+        try:
+            page.click("button:text('Only allow essential cookies')")
+            time.sleep(5)
+            stdout_log.info("Essential cookies step completed.")
+        except TimeoutError as e:
+            stdout_log.info(f"Button to allow essential cookies not found! {e}",)
 
         # Log in step
         stdout_log.info("Log in step started.")
