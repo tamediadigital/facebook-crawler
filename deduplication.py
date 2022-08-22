@@ -63,8 +63,7 @@ def aggregate_per_city_files():
     with gzip.open(AGGREGATED_CITIES_FILE, "wb") as writer:
         for city in ['zurich', 'bern', 'lausanne', 'lugano', 'geneva', 'st_gallen', 'basel', 'luzern']:
             file_name = f"test-facebook-{city}-{YEAR}-{MONTH}-{DAY}.jsonl.gz"
-            s3_conn.download_file(
-                'cic-crawler-dev', f'fb/year={YEAR}/month={MONTH}/day={DAY}/per-city/{file_name}', file_name)
+            s3_conn.download_file(f'fb/year={YEAR}/month={MONTH}/day={DAY}/per-city/{file_name}', file_name)
             if file_name.endswith(".gz"):
                 input = gzip.GzipFile(file_name, "rb")
                 for line in input.readlines():
