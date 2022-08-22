@@ -31,9 +31,9 @@ class FacebookCarCrawler:
     @staticmethod
     def _parse_items(page_content: str):
         soup = BeautifulSoup(page_content, 'html.parser')
+        # TODO: raw_items css selector will change over the time
         raw_items: list = soup.select(
-            "div.b3onmgus.ph5uu5jm.g5gj957u.buofh1pr.cbu4d94t.rj1gh0hx.j83agx80.rq0escxv.fnqts5cd"
-            ".fo9g3nie.n1dktuyu.e5nlhep0.ecm0bbzt")
+            "div.lcfup58g.fzd7ma4j.i15ihif8.cgu29s5g.cqf1kptm.jg3vgc78.alzwoclg.bdao358l.p2pkoip2.qez6140x.r0bj8g6i.o9wcebwi.d2hqwtrz")
 
         parsed_items: list = []
         for item in raw_items:
@@ -44,7 +44,8 @@ class FacebookCarCrawler:
                 item_url = item_url_splited[0].strip()
                 item_id = item_url.split("item/")[1].strip()
 
-                item_data: list = item.select('div.aahdfvyu.fsotbgu8')
+                # TODO: item_data css selector will change over the time
+                item_data: list = item.select('div.i0rxk2l3.d2v05h0u')
                 if not item_data:
                     continue
 
@@ -173,9 +174,9 @@ class FacebookCarCrawler:
                     if previous_search_city != required_city:
                         stdout_log.info("Change city in search params if it is different from required step.")
                         if 'kilometres' in previous_search_km_range:
-                            page.locator('span:text("kilometres")').click()
+                            page.locator('span:text("kilometres") >> nth=0').click()
                         else:
-                            page.locator('span:text("kilometre")').click()
+                            page.locator('span:text("kilometre") >> nth=0').click()
                         time.sleep(5)
 
                         page.fill("span:text('Location') + input", required_city)  # hardcoded
@@ -193,9 +194,9 @@ class FacebookCarCrawler:
                     if 'kilometres' in previous_search_km_range and km_range == 1:
                         stdout_log.info("Make starting point search to be from 1 km radius step.")
                         if 'kilometres' in previous_search_km_range:
-                            page.click('span:text("kilometres")')
+                            page.click('span:text("kilometres") >> nth=0')
                         else:
-                            page.click('span:text("kilometre")')
+                            page.click('span:text("kilometre") >> nth=0')
                         time.sleep(5)
 
                         page.click('span:text("kilometres") >> nth=1')
@@ -214,16 +215,14 @@ class FacebookCarCrawler:
                         pass
                     else:
                         if 'kilometres' in previous_search_km_range:
-                            page.click('span:text("kilometres")')
-                            stdout_log.info("Line 217 completed")
+                            page.click('span:text("kilometres") >> nth=0')
                         else:
-                            page.click('span:text("kilometre")')
-                            stdout_log.info("Line 220 completed")
+                            page.click('span:text("kilometre") >> nth=0')
                         time.sleep(7)
 
                         page.locator("span:text('Radius') + div").click()
-                        stdout_log.info("Line 224 span:text('Radius') + div completed")
                         time.sleep(5)
+                        stdout_log.info("Line 224 span:text('Radius') + div completed")
 
                         page.locator(
                             f'span:text("{km_range} {helper_locator_for_km_range if km_range < 2 else "kilometres"}") >> nth=0').click()
@@ -239,16 +238,24 @@ class FacebookCarCrawler:
                     page_height = 1
                     while True:
                         stdout_log.info(f"Page height {page_height}")
-                        if self.strict_scroll and len(BeautifulSoup(page.content(), 'html.parser').select(
-                                "div.l9j0dhe7.f9o22wc5.ad2k81qe")) > 1:
-                            page.mouse.wheel(0, 15000)
+                        results_from_outside_your_search = BeautifulSoup(page.content(), 'html.parser').select(
+                            "div.nch0832m.ez8dtbzv.oxkhqvkx.g4qalytl.eo2axi11.p8zq7ayg.i7rjuzed.pry8b2m5.q6ul9yy4")
+                        stdout_log.info(f"results_from_outside_your_search {results_from_outside_your_search}")
+                        if results_from_outside_your_search:
+                            stdout_log.info("Results from outside your search stopped scrolling!")
+                            break
+                        del results_from_outside_your_search
+
+                        if page_height_after_scroll > 3000:
+                            stdout_log.info("Page height bigger than 3000 stopped scrolling!")
                             break
 
                         if page_height == page_height_after_scroll:
+                            stdout_log.info("Same page height before and after scroll stopped scrolling!")
                             break
 
                         page_height = page.evaluate('(window.innerHeight + window.scrollY)')
-                        page.mouse.wheel(0, 15000)
+                        page.mouse.wheel(0, 20000)
                         time.sleep(5)
                         page_height_after_scroll = page.evaluate('(window.innerHeight + window.scrollY)')
 
