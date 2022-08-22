@@ -11,3 +11,4 @@ than
   python3 main.py
 else
   python3 deduplication.py
+fi
