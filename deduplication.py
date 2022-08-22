@@ -33,7 +33,9 @@ def data_analysis():
     unique_aggregated_file: str = f"unique-{AGGREGATED_CITIES_FILE}"
     with gzip.open(unique_aggregated_file, "wb") as writer:
         for line in unique_listings:
-            writer.write(line)
+            json_str = json.dumps(line) + "\n"
+            json_bytes = json_str.encode('utf-8')
+            writer.write(json_bytes)
     writer.close()
     s3_conn.upload_file(f"unique-{AGGREGATED_CITIES_FILE}", per_city=False)
 
