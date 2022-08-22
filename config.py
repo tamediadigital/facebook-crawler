@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 CITIES_MAP = {
     'zurich': 'Zürich, Switzerland',
@@ -11,13 +12,10 @@ CITIES_MAP = {
     'luzern': 'Luzern, Switzerland'
     }
 
-# CRAWLER_NAME = os.environ.get("CRAWLER_NAME")
 FB_BOT_CREDENTIALS_PAIR = os.environ.get("FB_BOT_CREDENTIALS_PAIR")
 CRAWL_TYPE = os.environ.get("CRAWL_TYPE")
-DATETIME = os.environ.get("DATETIME")
 
-# REQUIRED_RANGES_IN_KM = os.environ.get("REQUIRED_RANGES_IN_KM")
-REQUIRED_RANGES_IN_KM = [1, 2, 5, 10, 20, 40, 60]
+REQUIRED_RANGES_IN_KM: list = os.environ.get("REQUIRED_RANGES_IN_KM").split("-")
 REQUIRED_CITY = os.environ.get("REQUIRED_CITY").split("-")
 STRICT_SCROLL: str = os.environ.get("STRICT_SCROLL")
 
@@ -33,3 +31,7 @@ S3_PREFIX = os.environ.get("S3_PREFIX")
 REDIS_HOST: str = os.environ.get("REDIS_HOST")
 REDIS_PORT: int = int(os.environ.get("REDIS_PORT"))
 REDIS_DB: int = int(os.environ.get("REDIS_DB"))
+
+DATE: str = os.environ.get("DATE")
+if not DATE:
+    DATE = datetime.now().date().strftime("%Y-%m-%d")

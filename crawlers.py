@@ -1,31 +1,25 @@
 import gzip
 import json
-import boto3
 import time
-
 
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
-from datetime import datetime
 from iteration_utilities import unique_everseen
-from config import CITIES_MAP, REQUIRED_RANGES_IN_KM, S3_PREFIX, S3_BUCKET, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+from config import CITIES_MAP, REQUIRED_RANGES_IN_KM, DATE
 from logger import stdout_log
 from retry_handler import retry
 from redis_db import redis_client
 from typing import List
+from s3_conn import s3_conn
 
 
 class FacebookCarCrawler:
-    def __init__(self, required_cities: list, fb_bot_email: str, fb_bot_pass: str, strict_scroll: str):
+    def __init__(self, required_cities: list, fb_bot_email: str, fb_bot_pass: str):
         self.cities_map = CITIES_MAP
-        self.s3 = boto3.client('s3',
-                               aws_access_key_id=AWS_ACCESS_KEY_ID,
-                               aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+        self.s3_conn = s3_conn
         self.required_cities = required_cities
-        self.strict_scroll = True if int(strict_scroll) else False
         self.fb_bot_email = fb_bot_email
         self.fb_bot_pass = fb_bot_pass
-        self.date = datetime.now().date().strftime("%Y-%m-%d")
         self.redis_client = redis_client
 
     @staticmethod
@@ -88,12 +82,6 @@ class FacebookCarCrawler:
         writer.close()
         stdout_log.info("File object made.")
         return file
-
-    def _upload_file_obj_to_s3(self, file):
-        year, month, day = self.date.split('-')
-        scroll = "strict" if self.strict_scroll else "full"
-        self.s3.upload_file(file, S3_BUCKET, f'{S3_PREFIX}/year={year}/month={month}/day={day}/type={scroll}-scroll/{file}')
-        stdout_log.info(f"File uploaded on s3. {S3_PREFIX}/year={year}/month={month}/day={day}/type={scroll}-scroll/{file}")
 
     @retry(TimeoutError, stdout_log)
     def crawling_process(self):
@@ -270,9 +258,9 @@ class FacebookCarCrawler:
                     stdout_log.info(f"Crawling listings for {km_range}km range completed.")
                     time.sleep(7)
 
-                file_path: str = f"test-facebook-{city}-{self.date}.jsonl.gz"
+                file_path: str = f"test-facebook-{city}-{DATE}.jsonl.gz"
                 file = self._make_file_obj(parsed_items_for_city, file_path)
-                self._upload_file_obj_to_s3(file)
+                self.s3_conn.upload_file(file, file_path)
 
                 uncrawled_cities.remove(city)
                 self.redis_client.insert_into_redis(uncrawled_cities)
