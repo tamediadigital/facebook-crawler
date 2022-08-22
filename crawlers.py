@@ -1,4 +1,5 @@
 import gzip
+import itertools
 import json
 import time
 
@@ -72,7 +73,7 @@ class FacebookCarCrawler:
 
     @staticmethod
     def _make_file_obj(parsed_items_for_city: List[list], file: str):
-        chained_list_of_items: list = list(unique_everseen(parsed_items_for_city))
+        chained_list_of_items: list = list(unique_everseen(list(itertools.chain.from_iterable(parsed_items_for_city))))
         with gzip.open(file, "wb") as writer:
             for item in chained_list_of_items:
                 json_str = json.dumps(item) + "\n"

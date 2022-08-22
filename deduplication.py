@@ -1,6 +1,7 @@
 import os
 import json
 import gzip
+import time
 
 from iteration_utilities import unique_everseen
 from config import DATE
@@ -64,10 +65,10 @@ def aggregate_per_city_files():
         for city in ['zurich', 'bern', 'lausanne', 'lugano', 'geneva', 'st_gallen', 'basel', 'luzern']:
             file_name = f"test-facebook-{city}-{YEAR}-{MONTH}-{DAY}.jsonl.gz"
             s3_conn.download_file(f'fb/year={YEAR}/month={MONTH}/day={DAY}/per-city/{file_name}', file_name)
-            if file_name.endswith(".gz"):
-                input = gzip.GzipFile(file_name, "rb")
-                for line in input.readlines():
-                    writer.write(line)
+            time.sleep(2)
+            _input = gzip.GzipFile(file_name, "rb")
+            for line in _input.readlines():
+                writer.write(line)
             os.remove(file_name)
 
     writer.close()
