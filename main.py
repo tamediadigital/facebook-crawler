@@ -1,5 +1,5 @@
 from crawlers import FacebookCarCrawler
-from config import REQUIRED_CITY, FB_BOT_EMAIL, FB_BOT_PASS, STRICT_SCROLL
+from config import REQUIRED_CITY, FB_BOT_EMAIL, FB_BOT_PASS, SCROLL_HEIGHT
 from logger import stdout_log
 from redis_db import redis_client
 
@@ -11,9 +11,9 @@ def main():
     crawler = FacebookCarCrawler(required_cities=REQUIRED_CITY,
                                  fb_bot_email=FB_BOT_EMAIL,
                                  fb_bot_pass=FB_BOT_PASS,
-                                 strict_scroll=STRICT_SCROLL)
+                                 scroll_height=SCROLL_HEIGHT)
     stdout_log.info("FacebookCarCrawler init.")
-    stdout_log.info(f"STRICT_SCROLL {STRICT_SCROLL}")
+    stdout_log.info(f"SCROLL_HEIGHT {SCROLL_HEIGHT}")
 
     crawler.crawling_process()
 

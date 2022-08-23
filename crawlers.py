@@ -15,13 +15,14 @@ from s3_conn import s3_conn
 
 
 class FacebookCarCrawler:
-    def __init__(self, required_cities: list, fb_bot_email: str, fb_bot_pass: str):
+    def __init__(self, required_cities: list, fb_bot_email: str, fb_bot_pass: str, scroll_height: int):
         self.cities_map = CITIES_MAP
         self.s3_conn = s3_conn
         self.required_cities = required_cities
         self.fb_bot_email = fb_bot_email
         self.fb_bot_pass = fb_bot_pass
         self.redis_client = redis_client
+        self.scroll_height = scroll_height
 
     @staticmethod
     def _parse_items(page_content: str):
@@ -229,14 +230,14 @@ class FacebookCarCrawler:
                         stdout_log.info(f"Page height {page_height}")
                         results_from_outside_your_search = BeautifulSoup(page.content(), 'html.parser').select(
                             "div.nch0832m.ez8dtbzv.oxkhqvkx.g4qalytl.eo2axi11.p8zq7ayg.i7rjuzed.pry8b2m5.q6ul9yy4")
-                        stdout_log.info(f"results_from_outside_your_search {results_from_outside_your_search}")
+
                         if results_from_outside_your_search:
                             stdout_log.info("Results from outside your search stopped scrolling!")
                             break
                         del results_from_outside_your_search
 
-                        if page_height_after_scroll > 3000:
-                            stdout_log.info("Page height bigger than 3000 stopped scrolling!")
+                        if page_height_after_scroll > self.scroll_height:
+                            stdout_log.info(f"Page height bigger than {self.scroll_height} stopped scrolling!")
                             break
 
                         if page_height == page_height_after_scroll:

@@ -15,9 +15,9 @@ CITIES_MAP = {
 FB_BOT_CREDENTIALS_PAIR = os.environ.get("FB_BOT_CREDENTIALS_PAIR")
 CRAWL_TYPE = os.environ.get("CRAWL_TYPE")
 
-REQUIRED_RANGES_IN_KM: list = os.environ.get("REQUIRED_RANGES_IN_KM").split("-")
-REQUIRED_CITY = os.environ.get("REQUIRED_CITY").split("-")
-STRICT_SCROLL: str = os.environ.get("STRICT_SCROLL")
+REQUIRED_RANGES_IN_KM: list = os.environ.get("REQUIRED_RANGES_IN_KM").split("-") if os.environ.get("REQUIRED_RANGES_IN_KM") else []
+REQUIRED_CITY: list = os.environ.get("REQUIRED_CITY").split("-") if os.environ.get("REQUIRED_CITY") else []
+SCROLL_HEIGHT: int = int(os.environ.get("SCROLL_HEIGHT")) if os.environ.get("SCROLL_HEIGHT") else 3000
 
 FB_BOT_EMAIL: str = os.environ.get(f"FB_BOT_EMAIL_{FB_BOT_CREDENTIALS_PAIR}")
 FB_BOT_PASS: str = os.environ.get(f"FB_BOT_PASS_{FB_BOT_CREDENTIALS_PAIR}")
