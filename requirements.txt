@@ -1,6 +1,7 @@
 playwright
 beautifulsoup4
 boto3
+botocore
 redis
 backoff
 iteration_utilities

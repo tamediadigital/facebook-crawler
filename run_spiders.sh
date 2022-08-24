@@ -8,6 +8,8 @@ echo $DATE
 if [ "$FILE_TO_EXECUTE" == "crawling" ]; then
     python3 -m playwright install firefox
     python main.py
+elif [ "$FILE_TO_EXECUTE" == "delta" ]; then
+    python delta.py
 else
     python deduplication.py
 fi
