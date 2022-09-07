@@ -10,6 +10,8 @@ if [ "$FILE_TO_EXECUTE" == "crawling" ]; then
     python main.py
 elif [ "$FILE_TO_EXECUTE" == "delta" ]; then
     python delta.py
+elif [ "$FILE_TO_EXECUTE" == "pagination" ]; then
+    python pagination.py
 else
     python deduplication.py
 fi

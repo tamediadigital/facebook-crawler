@@ -31,6 +31,10 @@ REDIS_HOST: str = os.environ.get("REDIS_HOST")
 REDIS_PORT: int = int(os.environ.get("REDIS_PORT"))
 REDIS_DB: int = int(os.environ.get("REDIS_DB"))
 
+PROXYEMPIRE_SERVER: str = "rotating.proxyempire.io:9000"
+PROXYEMPIRE_MOBILE_USERNAME: str = os.environ.get("PROXYEMPIRE_MOBILE_USERNAME")
+PROXYEMPIRE_MOBILE_PASS: str = os.environ.get("PROXYEMPIRE_MOBILE_PASS")
+
 DATE: str = os.environ.get("DATE")
 if not DATE:
     DATE = datetime.now().date().strftime("%Y-%m-%d")
