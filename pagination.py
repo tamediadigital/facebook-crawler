@@ -77,6 +77,11 @@ class BasePagination:
 
                     # collect the data
                     # ...
+                    stdout_log.info(f"Loaded url: {page.url}")
+                    screenshot = f"screenshot-{item['item_id']}.png"
+                    page.screenshot(path=screenshot, full_page=False)
+                    time.sleep(2)
+                    s3_conn.upload_file(screenshot, per_city=False)
                 except Exception as e:
                     stdout_log.error("Error occurs!")
                     page.close()
