@@ -11,6 +11,7 @@ if [ "$FILE_TO_EXECUTE" == "crawling" ]; then
 elif [ "$FILE_TO_EXECUTE" == "delta" ]; then
     python delta.py
 elif [ "$FILE_TO_EXECUTE" == "pagination" ]; then
+    python3 -m playwright install firefox
     python pagination.py
 else
     python deduplication.py
