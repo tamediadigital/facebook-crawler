@@ -5,7 +5,7 @@ import time
 from playwright.sync_api import sync_playwright
 from logger import stdout_log
 from s3_conn import s3_conn
-from config_for_testing import DATE, PROXYEMPIRE_SERVER, PROXYEMPIRE_MOBILE_USERNAME, PROXYEMPIRE_MOBILE_PASS
+from config import DATE, PROXYEMPIRE_SERVER, PROXYEMPIRE_MOBILE_USERNAME, PROXYEMPIRE_MOBILE_PASS
 from datetime import timedelta, datetime
 
 
