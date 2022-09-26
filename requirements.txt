@@ -5,3 +5,5 @@ botocore
 redis
 backoff
 iteration_utilities
+pydantic
+requests
