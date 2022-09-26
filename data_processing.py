@@ -48,7 +48,7 @@ class ScrollDataProcessor:
         aggregated_scroll_results: List[dict] = self._aggregated_scroll_results()
         stdout_log.info(f"Aggregated scroll results -> len: {len(aggregated_scroll_results)}")
 
-        unique_ids: List[str] = list(set([item["item_id"] for item in aggregated_scroll_results]))
+        unique_ids: List[str] = list(set([item["ad_id"] for item in aggregated_scroll_results]))
         unique_listings: List[dict] = list(unique_everseen(aggregated_scroll_results))
 
         stdout_log.info(f"Unique ids from aggregated scroll results -> len: {len(unique_ids)}")
@@ -64,10 +64,10 @@ class DataProcessor:
     def __init__(self, date, scroll_results_from_today):
         self.date: str = date
         self.previous_day_snapshot: List[dict] = self._get_previous_day_snapshot()
-        self.previous_day_snapshot_ids: List[str] = [item["item_id"] for item in self.previous_day_snapshot]
+        self.previous_day_snapshot_ids: List[str] = [item["ad_id"] for item in self.previous_day_snapshot]
         stdout_log.info(f"Previous day snapshot results -> len: {len(self.previous_day_snapshot_ids)}")
         self.scroll_results_from_today: List[dict] = scroll_results_from_today
-        self.scroll_results_from_today_ids: List[str] = [item["item_id"] for item in self.scroll_results_from_today]
+        self.scroll_results_from_today_ids: List[str] = [item["ad_id"] for item in self.scroll_results_from_today]
         stdout_log.info(f"Scroll results from today -> len: {len(self.scroll_results_from_today_ids)}")
 
     @staticmethod
@@ -95,21 +95,21 @@ class DataProcessor:
     def not_found_listings(self):
         """Creates output file from listings which are in snapshot T-1 but not in scroll T0."""
         not_found_listings: List[dict] = [record for record in self.previous_day_snapshot
-                                          if record["item_id"] not in self.scroll_results_from_today_ids]
+                                          if record["ad_id"] not in self.scroll_results_from_today_ids]
         file_name: str = f"not-found-listings-in-scroll-{self.date}.jsonl.gz"
         self._create_and_upload_file(file_name, not_found_listings)
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
         delta_listings: List[dict] = [record for record in self.scroll_results_from_today
-                                      if record["item_id"] not in self.previous_day_snapshot_ids]
+                                      if record["ad_id"] not in self.previous_day_snapshot_ids]
         file_name: str = f"delta-listings-{self.date}.jsonl.gz"
         self._create_and_upload_file(file_name, delta_listings)
 
     def overlap_listings(self):
         """Creates output file from listings which are bot in T-1 snapshot and T0 scroll."""
         overlap_listings: List[dict] = [record for record in self.scroll_results_from_today
-                                        if record["item_id"] in self.previous_day_snapshot_ids]
+                                        if record["ad_id"] in self.previous_day_snapshot_ids]
         file_name: str = f"overlap-listings-{self.date}.jsonl.gz"
         self._create_and_upload_file(file_name, overlap_listings)
 
