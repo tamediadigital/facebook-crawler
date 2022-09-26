@@ -54,7 +54,7 @@ class ScrollDataProcessor:
         stdout_log.info(f"Unique ids from aggregated scroll results -> len: {len(unique_ids)}")
         stdout_log.info(f"Unique items of aggregated scroll results -> len: {len(unique_listings)}")
 
-        unique_swiss_listings: List[dict] = [item for item in unique_listings if item.get("item_canton_code")
+        unique_swiss_listings: List[dict] = [item for item in unique_listings if item.get("canton_code")
                                              in self.canton_codes]
         stdout_log.info(f"Unique SWISS items of aggregated scroll results -> len: {len(unique_swiss_listings)}")
         return unique_swiss_listings
