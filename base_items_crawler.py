@@ -53,7 +53,7 @@ class FacebookBaseItemsCrawler:
         for city, city_code in CITIES_CITIES_CODE_MAP.items():
             parsed_items_for_city: list = []
             for p_comb in PRICE_COMBINATIONS:
-                browser = playwright.firefox.launch(headless=False, proxy={
+                browser = playwright.firefox.launch(headless=True, proxy={
                     "server": SOCIAL_PROXY_SERVER,
                     "username": SOCIAL_PROXY_USERNAME,
                     "password": SOCIAL_PROXY_PASS
@@ -78,10 +78,6 @@ class FacebookBaseItemsCrawler:
                 while True:
                     stdout_log.info(f"Page height {page_height}")
                     if page_height == page_height_after_scroll:
-                        stdout_log.info("Same page height before and after scroll stopped scrolling!")
-                        break
-
-                    if page_height > 2000:
                         stdout_log.info("Same page height before and after scroll stopped scrolling!")
                         break
 
