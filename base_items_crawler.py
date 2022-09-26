@@ -8,7 +8,7 @@ import requests
 from typing import List
 from playwright.sync_api import sync_playwright
 from config import CITIES_CITIES_CODE_MAP, DATE, SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, \
-    SOCIAL_PROXY_PASS, SOCIAL_PROXY_B64_STR, SOCIAL_PROXY_KEY, SOCIAL_PROXY_SECRET, PRICE_COMBINATIONS
+    SOCIAL_PROXY_PASS, SOCIAL_PROXY_B64_STR, SOCIAL_PROXY_KEY, SOCIAL_PROXY_SECRET, PRICE_COMBINATIONS, REQUIRED_CITY
 from logger import stdout_log
 from s3_conn import s3_conn
 from parsers import parse_base_item
@@ -46,11 +46,13 @@ class FacebookBaseItemsCrawler:
         stdout_log.info(proxy_list)
 
     def crawling_process(self):
+        # TODO: Implement error handling
         # Init browser, page with proxy
         stdout_log.info("Init step started.")
         playwright = sync_playwright().start()
 
-        for city, city_code in CITIES_CITIES_CODE_MAP.items():
+        for city in REQUIRED_CITY:
+            city_code: str = CITIES_CITIES_CODE_MAP[city]
             parsed_items_for_city: list = []
             for p_comb in PRICE_COMBINATIONS:
                 browser = playwright.firefox.launch(headless=True, proxy={
