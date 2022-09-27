@@ -113,10 +113,6 @@ class FacebookBaseItemsCrawler:
 
                     stdout_log.info(f"Scroll step completed.")
 
-                    if p_comb == "?maxPrice=11500&minPrice=5500" and city == "bern":
-                        stdout_log.info(f"TimeoutError")
-                        raise Exception()
-
                     # Parse items
                     stdout_log.info(f"Parsing items started.")
                     page_content: str = page.content()
