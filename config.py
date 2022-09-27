@@ -28,7 +28,7 @@ DEFAULT_PRICE_COMBINATIONS: list = ["?maxPrice=1500&minPrice=200", "?maxPrice=55
                                     "?maxPrice=11500&minPrice=5500", "?maxPrice=22500&minPrice=11500",
                                     "?maxPrice=1150000&minPrice=22500"]
 PRICE_COMBINATIONS: list = os.environ.get("PRICE_COMBINATIONS").split("-") \
-    if os.environ.get("PRICE_COMBINATIONS") else DEFAULT_REQUIRED_CITIES
+    if os.environ.get("PRICE_COMBINATIONS") else DEFAULT_PRICE_COMBINATIONS
 
 FB_BOT_CREDENTIALS_PAIR = os.environ.get("FB_BOT_CREDENTIALS_PAIR")
 
