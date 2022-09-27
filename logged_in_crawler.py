@@ -6,12 +6,12 @@ import time
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 from iteration_utilities import unique_everseen
-from config import CITIES_MAP, REQUIRED_RANGES_IN_KM, DATE
-from logger import stdout_log
+from config import CITIES_MAP, REQUIRED_RANGES_IN_KM, DATE, REQUIRED_CITIES, FB_BOT_EMAIL, FB_BOT_PASS
 from retry_handler import retry
-from redis_db import redis_client
 from typing import List
 from s3_conn import s3_conn
+from logger import stdout_log
+from redis_db import redis_client
 
 
 class FacebookCarCrawler:
@@ -273,3 +273,16 @@ class FacebookCarCrawler:
         browser.close()
         time.sleep(2)
         playwright.stop()
+
+
+if __name__ == '__main__':
+    redis_client.insert_into_redis(REQUIRED_CITIES)
+    stdout_log.info(f"REQUIRED_CITY {REQUIRED_CITIES}")
+    stdout_log.info(f"FB_BOT_EMAIL {FB_BOT_EMAIL}")
+    crawler = FacebookCarCrawler(required_cities=REQUIRED_CITIES,
+                                 fb_bot_email=FB_BOT_EMAIL,
+                                 fb_bot_pass=FB_BOT_PASS)
+    stdout_log.info("FacebookCarCrawler init.")
+    stdout_log.info(f"STRICT SCROLL")
+
+    crawler.crawling_process()

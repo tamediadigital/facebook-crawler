@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-REQUIRED_CITIES = ["zurich", "bern", "lausanne", "lugano", "geneva", "st_gallen", "basel", "luzern"]
+DEFAULT_REQUIRED_CITIES = ["zurich", "bern", "lausanne", "lugano", "geneva", "st_gallen", "basel", "luzern"]
 CITIES_MAP = {
     'zurich': 'Zürich, Switzerland',
     'bern': 'Bern',
@@ -24,16 +24,18 @@ CITIES_CITIES_CODE_MAP = {
     'luzern': '115581378455439'
     }
 
-PRICE_COMBINATIONS: list = ["?maxPrice=1500&minPrice=200", "?maxPrice=5500&minPrice=1500",
-                            "?maxPrice=11500&minPrice=5500", "?maxPrice=22500&minPrice=11500",
-                            "?maxPrice=1150000&minPrice=22500"]
+DEFAULT_PRICE_COMBINATIONS: list = ["?maxPrice=1500&minPrice=200", "?maxPrice=5500&minPrice=1500",
+                                    "?maxPrice=11500&minPrice=5500", "?maxPrice=22500&minPrice=11500",
+                                    "?maxPrice=1150000&minPrice=22500"]
+PRICE_COMBINATIONS: list = os.environ.get("PRICE_COMBINATIONS").split("-") \
+    if os.environ.get("PRICE_COMBINATIONS") else DEFAULT_REQUIRED_CITIES
 
 FB_BOT_CREDENTIALS_PAIR = os.environ.get("FB_BOT_CREDENTIALS_PAIR")
-CRAWL_TYPE = os.environ.get("CRAWL_TYPE")
 
 REQUIRED_RANGES_IN_KM: list = os.environ.get("REQUIRED_RANGES_IN_KM").split("-") \
     if os.environ.get("REQUIRED_RANGES_IN_KM") else []
-REQUIRED_CITY: list = os.environ.get("REQUIRED_CITY").split("-") if os.environ.get("REQUIRED_CITY") else []
+REQUIRED_CITIES: list = os.environ.get("REQUIRED_CITIES").split("-") if os.environ.get("REQUIRED_CITIES") \
+    else DEFAULT_REQUIRED_CITIES
 
 FB_BOT_EMAIL: str = os.environ.get(f"FB_BOT_EMAIL_{FB_BOT_CREDENTIALS_PAIR}")
 FB_BOT_PASS: str = os.environ.get(f"FB_BOT_PASS_{FB_BOT_CREDENTIALS_PAIR}")

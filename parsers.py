@@ -56,7 +56,6 @@ def parse_base_item(page_content: str) -> List[dict]:
 
         base_item: BaseItem = BaseItem(ad_id=item_id, url=item_url, price=item_price, city=item_city,
                                        canton_code=item_canton_code, short_desc=item_short_desc, mileage=item_mileage)
-        print(base_item.dict())
         parsed_items.append(base_item.dict())
 
     return parsed_items
