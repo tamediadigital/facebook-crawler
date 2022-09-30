@@ -23,6 +23,7 @@ class ScrollCarsCrawler(BaseCarsCrawler):
 
     @retry(TimeoutError, stdout_log)
     def scrolling_process(self):
+        stdout_log.info(f"type={type(self.proxy.server)}, {self.proxy.server}")
         redis_required_cities: list = self.redis_client.get_mappings(key="scroll-crawler-cities-list")
         if redis_required_cities:
             self.required_cities = redis_required_cities
