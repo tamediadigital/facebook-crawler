@@ -13,13 +13,13 @@ from config import SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS
 if __name__ == '__main__':
     proxy = Proxy(SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS, SOCIAL_PROXY_KEY, SOCIAL_PROXY_SECRET,
                   SOCIAL_PROXY_B64_STR)
-    ScrollCarsCrawler(proxy).scrolling_process()
+    ScrollCarsCrawler(proxy=proxy).scrolling_process()
 
     data_processor = DataProcessor()
     data_processor.listings_to_check()
     data_processor.delta_listings()
     overlap_listings = data_processor.overlap_listings()
 
-    delta_listings_with_details: List[dict] = DeltaCarsCrawler(proxy).get_details_for_delta_cars_process()
-    checked_listings: List[dict] = CarsAvailabilityCheckCrawler(proxy).cars_availability_check_process()
+    delta_listings_with_details: List[dict] = DeltaCarsCrawler(proxy=proxy).get_details_for_delta_cars_process()
+    checked_listings: List[dict] = CarsAvailabilityCheckCrawler(proxy=proxy).cars_availability_check_process()
     data_processor.make_snapshot(delta_listings_with_details, checked_listings, overlap_listings)
