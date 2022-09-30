@@ -1,5 +1,9 @@
-from typing import List, Optional
 from pydantic import BaseModel
+
+
+class Seller(BaseModel):
+    seller_id: str
+    seller_name: str
 
 
 class BaseItem(BaseModel):
@@ -8,5 +12,3 @@ class BaseItem(BaseModel):
     price: str
     city: str
     canton_code: str
-    short_desc: Optional[str]
-    mileage: Optional[str]

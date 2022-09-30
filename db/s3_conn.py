@@ -2,7 +2,7 @@ import boto3
 
 from datetime import timedelta, datetime
 from config import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, DATE, S3_BUCKET, S3_PREFIX
-from logger import stdout_log
+from utils.logger import stdout_log
 
 
 class S3Conn:

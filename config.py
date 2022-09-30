@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from typing import List
 
 DEFAULT_REQUIRED_CITIES = ["zurich", "bern", "lausanne", "lugano", "geneva", "st_gallen", "basel", "luzern"]
 CITIES_MAP = {
@@ -60,3 +61,10 @@ SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR")
 DATE: str = os.environ.get("DATE")
 if not DATE:
     DATE = datetime.now().date().strftime("%Y-%m-%d")
+
+PAGE_HEIGHT_SCROLL_POOL: List[int] = [15000, 15500, 16000, 16500, 17000, 17500, 18000, 18500, 19000, 19500, 20000,
+                                      20500]
+PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
+
+LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
+    if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20
