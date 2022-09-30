@@ -13,8 +13,8 @@ from config import DATE
 class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
     _FILE_NAME_PREFIX = "listings-to-check"
 
-    def __init__(self, proxy):
-        super().__init__(proxy)
+    def __init__(self):
+        super().__init__()
         self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
         self.available_items = []
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")

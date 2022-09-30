@@ -8,15 +8,13 @@ from playwright.sync_api import sync_playwright
 from config import CITIES_CITIES_CODE_MAP, DATE, REQUIRED_CITIES, PRICE_COMBINATIONS
 from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
 from utils.logger import stdout_log
-from utils.proxy import Proxy
 from utils.retry_handler import retry
 from parsers.automotive_parsers import parse_partial_cars
 
 
 class ScrollCarsCrawler(BaseCarsCrawler):
-    def __init__(self, proxy: Proxy):
+    def __init__(self):
         super().__init__()
-        self.proxy = proxy
         self.required_cities = REQUIRED_CITIES
         self.price_combinations = PRICE_COMBINATIONS
         self.redis_client.insert_into_redis(REQUIRED_CITIES, key="scroll-crawler-cities-list")

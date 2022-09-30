@@ -8,7 +8,6 @@ from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
 from utils.logger import stdout_log
 from parsers.automotive_parsers import parse_car
 from parsers.base_parsers import is_see_more
-from utils.proxy import Proxy
 from utils.retry_handler import retry
 from config import DATE
 
@@ -16,9 +15,8 @@ from config import DATE
 class DeltaCarsCrawler(BaseCarsCrawler):
     _FILE_NAME_PREFIX = "delta-listings"
 
-    def __init__(self, proxy: Proxy):
+    def __init__(self):
         super().__init__()
-        self.proxy = proxy
         self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
         self.paginated_items = []
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
