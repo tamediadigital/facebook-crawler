@@ -6,6 +6,7 @@ import time
 from playwright.sync_api import sync_playwright
 from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
 from utils.logger import stdout_log
+from utils.proxy import Proxy
 from utils.retry_handler import retry
 from config import DATE
 
@@ -13,8 +14,8 @@ from config import DATE
 class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
     _FILE_NAME_PREFIX = "listings-to-check"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, proxy: Proxy):
+        super().__init__(proxy)
         self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
         self.available_items = []
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
