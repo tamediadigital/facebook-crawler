@@ -67,7 +67,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                     stdout_log.info(f"PAGE GO TO: {url}")
                     page.goto(url)
                     time.sleep(5)
-                    if not cookie_accepted:
+                    if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
                         page.click("span:text('Only allow essential cookies')")
                         time.sleep(2)
@@ -120,4 +120,6 @@ class DeltaCarsCrawler(BaseCarsCrawler):
         file_name: str = f"facebook-delta-paginated-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
         stdout_log.info("Get details for delta cars process finished.")
+        time.sleep(2)
+        playwright.stop()
         return self.paginated_items

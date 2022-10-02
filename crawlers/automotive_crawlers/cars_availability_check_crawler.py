@@ -63,9 +63,10 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                 try:
                     url = item['url']
                     stdout_log.info(f"PAGE GO TO: {url}")
-                    page.goto(url)
+                    page.set_default_timeout(60000)
+                    page.goto(url, wait_until="load")
                     time.sleep(5)
-                    if not cookie_accepted:
+                    if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
                         page.click("span:text('Only allow essential cookies')")
                         time.sleep(2)
@@ -119,4 +120,6 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
         file_name: str = f"facebook-available-cars-paginated-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.available_items)
         stdout_log.info("Cars availability check process finished.")
+        time.sleep(2)
+        playwright.stop()
         return self.available_items
