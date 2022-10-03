@@ -2,7 +2,8 @@ import os
 from datetime import datetime
 from typing import List
 
-DEFAULT_REQUIRED_CITIES = ["zurich", "bern", "lausanne", "lugano", "geneva", "st_gallen", "basel", "luzern"]
+DEFAULT_REQUIRED_CITIES = ["zurich", "bern", "lausanne", "lugano", "geneva", "st_gallen", "basel", "luzern", "chur",
+                           "thun", "sion", "fribourg", "olten"]
 CITIES_MAP = {
     'zurich': 'Zürich, Switzerland',
     'bern': 'Bern',
@@ -22,7 +23,12 @@ CITIES_CITIES_CODE_MAP = {
     'geneva': '110868505604715',
     'st_gallen': '110759738952928',
     'basel': '108671032497097',
-    'luzern': '115581378455439'
+    'luzern': '115581378455439',
+    'chur': '106239312747810',
+    'thun': '114513118565117',
+    'sion': '109513215741594',
+    'fribourg': '108257202542190',
+    'olten': '114243855254869'
     }
 
 DEFAULT_PRICE_COMBINATIONS: list = ["?maxPrice=1500&minPrice=200", "?maxPrice=5500&minPrice=1500",

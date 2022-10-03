@@ -117,6 +117,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
+        stdout_log.info(f"Paginated items len: {len(self.paginated_items)}")
         file_name: str = f"facebook-delta-paginated-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
         stdout_log.info("Get details for delta cars process finished.")

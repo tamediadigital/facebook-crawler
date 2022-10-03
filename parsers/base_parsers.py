@@ -13,8 +13,8 @@ def parse_seller(page_content: str):
     res = result.group(1)
     try:
         seller_data = json.loads(res)
-        seller_id = seller_data[0]["name"]
-        seller_name = seller_data[0]["id"]
+        seller_id = seller_data[0]["id"]
+        seller_name = seller_data[0]["name"]
         seller = Seller(seller_id=seller_id, seller_name=seller_name)
     except [IndexError, KeyError]:
         return
