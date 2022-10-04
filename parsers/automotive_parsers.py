@@ -70,13 +70,16 @@ def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict,
         title = _title.text
         if "Sold" in title:
             del soup
+            stdout_log.info("Return sold")
             return
     else:
         del soup
+        stdout_log.info("Return no title")
         return
 
     seller = parse_seller(page_content)
     if not seller:
+        stdout_log.info("Return no seller")
         return
 
     _publish_time = soup.select_one("div.gt60zsk1.rl78xhln.r227ecj6.g4qalytl span.gvxzyvdx.aeinzg81.t7p7dqev.gh25dzvf"
