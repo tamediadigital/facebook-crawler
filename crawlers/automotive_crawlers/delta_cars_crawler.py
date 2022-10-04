@@ -81,15 +81,21 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
                         if is_see_more(page.content()):
+                            stdout_log.info(f"is_see_more")
                             page.click('span:text("See More") >> nth=1')
                             time.sleep(0.5)
+                            stdout_log.info(f'span:text("See More") >> nth=1')
                             parsed_item = parse_car(page.content(), item, see_more=True)
+                            stdout_log.info(f'is_see_more parsed_item: {parsed_item}')
                             if parsed_item:
                                 self.paginated_items.append(parsed_item)
+                                stdout_log.info(f'if parsed item is_see_more parsed_item: {parsed_item}')
                         else:
                             parsed_item = parse_car(page.content(), item)
+                            stdout_log.info(f'no see more parsed_item: {parsed_item}')
                             if parsed_item:
                                 self.paginated_items.append(parsed_item)
+                                stdout_log.info(f'if parsed_item no see_more parsed_item: {parsed_item}')
                         stdout_log.info(f"93 Paginated items len: {len(self.paginated_items)}")
                     elif "login" in page_url and "next" in page_url:
                         stdout_log.error(f"Proxy dead on url: {page.url}")
