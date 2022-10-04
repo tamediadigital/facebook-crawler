@@ -94,7 +94,10 @@ def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict,
             description = description.replace("See less", "")
 
     _images = soup.select("img.pytsy3co.p9wrh9lq.mfclru0v")
-    images = [image.get('src') for image in _images][1:] if _images else None
+    if len(_images) <= 1:
+        images = [image.get('src') for image in _images] if _images else None
+    else:
+        images = [image.get('src') for image in _images][1:] if _images else None
     del soup
 
     return Car(**base_item, title=title, publish_time=publish_time,

@@ -18,7 +18,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
 
     def __init__(self, proxy: Proxy):
         super().__init__(proxy)
-        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
+        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)[:50]
         self.paginated_items = []
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
 
@@ -90,6 +90,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                             parsed_item = parse_car(page.content(), item)
                             if parsed_item:
                                 self.paginated_items.append(parsed_item)
+                        stdout_log.info(f"93 Paginated items len: {len(self.paginated_items)}")
                     elif "login" in page_url and "next" in page_url:
                         stdout_log.error(f"Proxy dead on url: {page.url}")
                         page.close()
@@ -97,6 +98,8 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                         i -= 1
                         error_happened = True
                         break
+                    stdout_log.info(f"101 Paginated items len: {len(self.paginated_items)}")
+                    print(self.paginated_items)
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()
@@ -109,6 +112,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                 stdout_log.info(f"Executed chunk items {executed_chunk_items}")
                 _items_to_paginate.remove(item)
                 self.redis_client.insert_into_redis(_items_to_paginate, key="car-urls-to-paginate")
+                stdout_log.info(f"115 Paginated items len: {len(self.paginated_items)}")
 
             executed_chunk_items = 0 if not error_happened else executed_chunk_items
             stdout_log.info(f"Executed chunk items {executed_chunk_items}")
@@ -118,7 +122,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
             self.proxy.rotate_proxy_call()
 
         stdout_log.info(f"Paginated items len: {len(self.paginated_items)}")
-        file_name: str = f"facebook-delta-paginated-{DATE}.jsonl.gz"
+        file_name: str = f"test-facebook-delta-paginated-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
         stdout_log.info("Get details for delta cars process finished.")
         time.sleep(2)
