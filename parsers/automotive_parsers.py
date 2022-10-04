@@ -11,8 +11,8 @@ def parse_partial_cars(page_content: str) -> List[dict]:
     # TODO: CSS selectors will change over the time!
 
     soup: BeautifulSoup = BeautifulSoup(page_content, 'html.parser')
-    raw_items_selector: str = "div.lcfup58g.fzd7ma4j.i15ihif8.cgu29s5g.cqf1kptm.jg3vgc78.alzwoclg.bdao358l.p2pkoip2" \
-                              ".qez6140x.r0bj8g6i.o9wcebwi.d2hqwtrz"
+    raw_items_selector: str = "div.x1e558r4.x150jy0e.xs83m0k.x1iyjqo2.xdt5ytf.x1r8uery.x78zum5.x9f619.x291uyu" \
+                              ".x1uepa24.xnpuxes.xjkvuk6.x1iorvi4"
     raw_items: list = soup.select(raw_items_selector)
     stdout_log.info(f"raw_items len: {len(raw_items)}")
     del soup
@@ -35,7 +35,7 @@ def parse_partial_cars(page_content: str) -> List[dict]:
             continue
 
         try:
-            item_data_selector: str = "div.i0rxk2l3.d2v05h0u"
+            item_data_selector: str = "div.x1gslohp.xkh6y0r"
             item_data: list = item.select(item_data_selector)
             if not item_data:
                 continue
