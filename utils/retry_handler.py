@@ -1,7 +1,7 @@
 import functools
 
 
-def retry(exception_to_check, logger, tries=3):
+def retry(exception_to_check, logger, tries=5):
     def deco_retry(f):
         @functools.wraps(f)
         def f_retry(*args, **kwargs):

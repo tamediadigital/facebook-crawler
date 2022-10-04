@@ -63,9 +63,9 @@ def parse_partial_cars(page_content: str) -> List[dict]:
 
 def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict, None]:
     soup: BeautifulSoup = BeautifulSoup(page_content, 'html.parser')
-    _title = soup.select_one("div.gt60zsk1.rl78xhln.r227ecj6.g4qalytl span.gvxzyvdx.aeinzg81.t7p7dqev.gh25dzvf"
-                             ".tb6i94ri.gupuyl1y.i2onq4tn.b6ax4al1.gem102v4.ncib64c9.mrvwc6qr.sx8pxkcf.f597kf1v"
-                             ".cpcgwwas.bx1hu7np.ib8x7mpr.qntmu8s7.tq4zoyjo.o48pnaf2.pbevjfx6")
+    _title = soup.select_one("div.x1swvt13.x18d9i69.x1pi30zi.xyamay9 span.x193iq5w.xeuugli.x13faqbe.x1vvkbs.xlh3980."
+                             "xvmahel.x1n0sxbx.x1lliihq.x1s928wv.xhkezso.x1gmr53x.x1cpjm7i.x1fgarty.x1943h6x.xtoi2st."
+                             "x41vudc.xngnso2.x1qb5hxa.x1xlr1w8.xzsf02u")
     if _title:
         title = _title.text
         if "Sold" in title:
@@ -82,21 +82,21 @@ def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict,
         stdout_log.info("Return no seller")
         return
 
-    _publish_time = soup.select_one("div.gt60zsk1.rl78xhln.r227ecj6.g4qalytl span.gvxzyvdx.aeinzg81.t7p7dqev.gh25dzvf"
-                                    ".tb6i94ri.gupuyl1y.i2onq4tn.b6ax4al1.gem102v4.ncib64c9.mrvwc6qr.sx8pxkcf.f597kf1v"
-                                    ".cpcgwwas.f5mw3jnl.szxhu1pg.nfkogyam.kkmhubc1.tes86rjd.rtxb060y")
+    _publish_time = soup.select_one("div.x1swvt13.x18d9i69.x1pi30zi.xyamay9 span.x193iq5w.xeuugli.x13faqbe.x1vvkbs"
+                                    ".xlh3980.xvmahel.x1n0sxbx.x1lliihq.x1s928wv.xhkezso.x1gmr53x.x1cpjm7i.x1fgarty"
+                                    ".x1943h6x.x4zkp8e.x676frb.x1nxh6w3.x1sibtaa.xo1l8bm.xi81zsa")
 
     publish_time: str = _publish_time.text if _publish_time else None
-    _description = soup.select_one("div.n3t5jt4f.nch0832m.rj2hsocd.oxkhqvkx.s1m0hq7j span.gvxzyvdx.aeinzg81.t7p7dqev"
-                                   ".gh25dzvf.tb6i94ri.gupuyl1y.i2onq4tn.b6ax4al1.gem102v4.ncib64c9.mrvwc6qr.sx8pxkcf"
-                                   ".f597kf1v.cpcgwwas.m2nijcs8.hxfwr5lz.k1z55t6l.oog5qr5w.tes86rjd.pbevjfx6")
+    _description = soup.select_one("div.x126k92a.xkhd6sd.xsag5q8.x4uap5.xz9dl7a span.x193iq5w.xeuugli.x13faqbe.x1vvkbs."
+                                   "xlh3980.xvmahel.x1n0sxbx.x1lliihq.x1s928wv.xhkezso.x1gmr53x.x1cpjm7i.x1fgarty"
+                                   ".x1943h6x.xudqn12.x3x7a5m.x6prxxf.xvq8zen.xo1l8bm.xzsf02u")
     description = None
     if _description:
         description = _description.text
         if see_more:
             description = description.replace("See less", "")
 
-    _images = soup.select("img.pytsy3co.p9wrh9lq.mfclru0v")
+    _images = soup.select("img.x5yr21d.xl1xv1r.xh8yej3")
     if len(_images) <= 1:
         images = [image.get('src') for image in _images] if _images else None
     else:

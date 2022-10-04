@@ -18,7 +18,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
 
     def __init__(self, proxy: Proxy):
         super().__init__(proxy)
-        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)[:50]
+        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
         self.paginated_items = []
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
 
@@ -65,7 +65,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                 try:
                     url = item['url']
                     stdout_log.info(f"PAGE GO TO: {url}")
-                    page.goto(url)
+                    page.goto(url, wait_until="load", timeout=90000)
                     time.sleep(5)
                     if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
@@ -81,22 +81,15 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
                         if is_see_more(page.content()):
-                            stdout_log.info(f"is_see_more")
                             page.click('span:text("See More") >> nth=1')
                             time.sleep(0.5)
-                            stdout_log.info(f'span:text("See More") >> nth=1')
                             parsed_item = parse_car(page.content(), item, see_more=True)
-                            stdout_log.info(f'is_see_more parsed_item: {parsed_item}')
                             if parsed_item:
                                 self.paginated_items.append(parsed_item)
-                                stdout_log.info(f'if parsed item is_see_more parsed_item: {parsed_item}')
                         else:
                             parsed_item = parse_car(page.content(), item)
-                            stdout_log.info(f'no see more parsed_item: {parsed_item}')
                             if parsed_item:
                                 self.paginated_items.append(parsed_item)
-                                stdout_log.info(f'if parsed_item no see_more parsed_item: {parsed_item}')
-                        stdout_log.info(f"93 Paginated items len: {len(self.paginated_items)}")
                     elif "login" in page_url and "next" in page_url:
                         stdout_log.error(f"Proxy dead on url: {page.url}")
                         page.close()
@@ -104,8 +97,6 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                         i -= 1
                         error_happened = True
                         break
-                    stdout_log.info(f"101 Paginated items len: {len(self.paginated_items)}")
-                    print(self.paginated_items)
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()
@@ -118,7 +109,6 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                 stdout_log.info(f"Executed chunk items {executed_chunk_items}")
                 _items_to_paginate.remove(item)
                 self.redis_client.insert_into_redis(_items_to_paginate, key="car-urls-to-paginate")
-                stdout_log.info(f"115 Paginated items len: {len(self.paginated_items)}")
 
             executed_chunk_items = 0 if not error_happened else executed_chunk_items
             stdout_log.info(f"Executed chunk items {executed_chunk_items}")
@@ -127,8 +117,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
-        stdout_log.info(f"Paginated items len: {len(self.paginated_items)}")
-        file_name: str = f"test-facebook-delta-paginated-{DATE}.jsonl.gz"
+        file_name: str = f"facebook-delta-paginated-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
         stdout_log.info("Get details for delta cars process finished.")
         time.sleep(2)

@@ -23,7 +23,7 @@ def parse_seller(page_content: str):
 
 def is_see_more(page_content: str) -> bool:
     soup = BeautifulSoup(page_content, 'html.parser')
-    see_more = soup.select("div.n3t5jt4f.nch0832m.rj2hsocd.oxkhqvkx.s1m0hq7j span.gvxzyvdx.aeinzg81.t7p7dqev"
-                           ".gh25dzvf.tb6i94ri.gupuyl1y.i2onq4tn.k1z55t6l.oog5qr5w.innypi6y.pbevjfx6")
+    see_more = soup.select("div.x126k92a.xkhd6sd.xsag5q8.x4uap5.xz9dl7a span.x193iq5w.xeuugli.x13faqbe.x1vvkbs.xlh3980"
+                           ".xvmahel.x1n0sxbx.x6prxxf.xvq8zen.x1s688f.xzsf02u")
     del soup
     return True if see_more else False

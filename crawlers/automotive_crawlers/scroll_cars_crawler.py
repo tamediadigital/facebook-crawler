@@ -57,7 +57,7 @@ class ScrollCarsCrawler(BaseCarsCrawler):
                     start_url: str = f"https://www.facebook.com/marketplace/{city_code}/cars/{p_comb}"
                     stdout_log.info(f"City: {city}")
                     stdout_log.info(f"PAGE GOING TO: {start_url}")
-                    page.goto(start_url)
+                    page.goto(start_url, wait_until="load", timeout=90000)
                     time.sleep(5)
 
                     # Allow essential cookies step.
@@ -101,7 +101,7 @@ class ScrollCarsCrawler(BaseCarsCrawler):
                     browser.close()
                     time.sleep(2)
                     playwright.stop()
-                    time.sleep(5*60)
+                    time.sleep(15*60)
                     raise TimeoutError()
 
                 page.close()
