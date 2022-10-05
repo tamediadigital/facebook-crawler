@@ -6,8 +6,7 @@ import time
 from playwright.sync_api import sync_playwright
 from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
 from utils.logger import stdout_log
-from parsers.automotive_parsers import parse_car
-from parsers.base_parsers import is_see_more
+from parsers.automotive_parsers import parse_car_regex
 from utils.proxy import Proxy
 from utils.retry_handler import retry
 from config import DATE
@@ -80,16 +79,9 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
-                        if is_see_more(page.content()):
-                            page.click('span:text("See More") >> nth=1')
-                            time.sleep(0.5)
-                            parsed_item = parse_car(page.content(), item, see_more=True)
-                            if parsed_item:
-                                self.paginated_items.append(parsed_item)
-                        else:
-                            parsed_item = parse_car(page.content(), item)
-                            if parsed_item:
-                                self.paginated_items.append(parsed_item)
+                        parsed_item = parse_car_regex(page.content(), item)
+                        if parsed_item:
+                            self.paginated_items.append(parsed_item)
                     elif "login" in page_url and "next" in page_url:
                         stdout_log.error(f"Proxy dead on url: {page.url}")
                         page.close()

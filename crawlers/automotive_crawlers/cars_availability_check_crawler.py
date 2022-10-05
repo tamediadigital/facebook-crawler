@@ -80,15 +80,6 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
                         #  TODO: update cars with available data from page content
-                        # if is_see_more(page.content()):
-                        #     page.click('span:text("See More") >> nth=1')
-                        #     time.sleep(0.5)
-                        #     parsed_item = parse_car(page.content(), item, see_more=True)
-                        #     if parsed_item:
-                        #         self.available_items.append(parsed_item)
-                        # else:
-                        #     parsed_item = parse_car(page.content(), item)
-                        #     if parsed_item:
                         self.available_items.append(item)
                     elif "login" in page_url and "next" in page_url:
                         stdout_log.error(f"Proxy dead on url: {page.url}")

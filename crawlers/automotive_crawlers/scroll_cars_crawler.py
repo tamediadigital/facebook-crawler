@@ -16,10 +16,16 @@ from parsers.automotive_parsers import parse_partial_cars
 class ScrollCarsCrawler(BaseCarsCrawler):
     def __init__(self, proxy: Proxy):
         super().__init__(proxy)
-        self.required_cities = REQUIRED_CITIES
+        required_cities_list = REQUIRED_CITIES.copy()
+        price_combinations_list = PRICE_COMBINATIONS.copy()
+        random.shuffle(required_cities_list)
+        random.shuffle(price_combinations_list)
+        stdout_log.info(required_cities_list)
+        stdout_log.info(price_combinations_list)
+        self.required_cities = required_cities_list
         self.price_combinations = PRICE_COMBINATIONS
-        self.redis_client.insert_into_redis(REQUIRED_CITIES, key="scroll-crawler-cities-list")
-        self.redis_client.insert_into_redis(PRICE_COMBINATIONS, key="scroll-crawler-prices-list")
+        self.redis_client.insert_into_redis(required_cities_list, key="scroll-crawler-cities-list")
+        self.redis_client.insert_into_redis(price_combinations_list, key="scroll-crawler-prices-list")
         self.redis_client.insert_into_redis([], key="collected-partial-cars-for-city-list")
 
     @retry(TimeoutError, stdout_log)

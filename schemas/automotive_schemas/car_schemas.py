@@ -9,7 +9,7 @@ class PartialCar(BaseItem):
 
 class Car(PartialCar):
     title: str
-    publish_time: str
+    publish_time: Optional[str]
     description: Optional[str]
     seller: Optional[Seller]
     images: Optional[List[str]]

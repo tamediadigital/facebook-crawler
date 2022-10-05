@@ -1,3 +1,5 @@
+import json
+import re
 from typing import List, Union
 from bs4 import BeautifulSoup
 from utils.logger import stdout_log
@@ -61,7 +63,7 @@ def parse_partial_cars(page_content: str) -> List[dict]:
     return parsed_items
 
 
-def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict, None]:
+def parse_car_css(page_content: str, base_item: dict, see_more=False) -> Union[dict, None]:
     soup: BeautifulSoup = BeautifulSoup(page_content, 'html.parser')
     _title = soup.select_one("div.x1swvt13.x18d9i69.x1pi30zi.xyamay9 span.x193iq5w.xeuugli.x13faqbe.x1vvkbs.xlh3980."
                              "xvmahel.x1n0sxbx.x1lliihq.x1s928wv.xhkezso.x1gmr53x.x1cpjm7i.x1fgarty.x1943h6x.xtoi2st."
@@ -102,6 +104,40 @@ def parse_car(page_content: str, base_item: dict, see_more=False) -> Union[dict,
     else:
         images = [image.get('src') for image in _images][1:] if _images else None
     del soup
+
+    return Car(**base_item, title=title, publish_time=publish_time,
+               description=description, seller=seller, images=images).dict()
+
+
+def parse_car_regex(page_content: str, base_item: dict) -> Union[dict, None]:
+    _title = re.search('"marketplace_listing_title":"(.*)","condition":', page_content)
+    if _title:
+        title = _title.group(1)
+        if "Sold" in title:
+            stdout_log.info("Listing is Sold!")
+            return
+    else:
+        stdout_log.info("No title data, invalid listing!")
+        return
+
+    seller = parse_seller(page_content)
+    if not seller:
+        stdout_log.info("No seller data, invalid listing!")
+        return
+
+    _publish_time = re.search('Listed <!-- -->(.*)<!-- --> in', page_content)
+    stdout_log.info(f"{_publish_time}")
+    publish_time: str = _publish_time.group(1) if _publish_time else None
+
+    _description = re.search('"redacted_description":{"text":"(.*)"},"creation_time"', page_content)
+    description: str = _description.group(1) if _description else None
+
+    try:
+        _images = re.search('"listing_photos":(.*),"pre_recorded_videos"', page_content)
+        images = [i["image"]["uri"] for i in json.loads(_images.group(1))] if _images else None
+    except KeyError as e:
+        stdout_log.error(e)
+        images = None
 
     return Car(**base_item, title=title, publish_time=publish_time,
                description=description, seller=seller, images=images).dict()
