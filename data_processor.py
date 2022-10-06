@@ -81,8 +81,8 @@ class DataProcessor(BaseCrawler):
 
     def overlap_listings(self):
         """Creates output file from listings which are bot in T-1 snapshot and T0 scroll."""
-        overlap_listings: List[dict] = [record for record in self.scroll_results_from_today
-                                        if record["ad_id"] in self.previous_day_snapshot_ids]
+        overlap_listings: List[dict] = [record for _id, record in self.previous_day_snapshot.items()
+                                        if _id in self.scroll_results_from_today_ids]
         file_name: str = f"overlap-listings-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, overlap_listings)
         return overlap_listings
