@@ -126,7 +126,6 @@ def parse_car_regex(page_content: str, base_item: dict) -> Union[dict, None]:
         return
 
     _publish_time = re.search('Listed <!-- -->(.*)<!-- --> in', page_content)
-    stdout_log.info(f"{_publish_time}")
     publish_time: str = _publish_time.group(1) if _publish_time else None
 
     _description = re.search('"redacted_description":{"text":"(.*)"},"creation_time"', page_content)
