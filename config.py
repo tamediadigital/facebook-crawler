@@ -74,3 +74,9 @@ PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
     if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20
+
+DELTA_LISTINGS_PAGINATION_STEP = int(os.environ.get("DELTA_LISTINGS_PAGINATION_STEP")) \
+    if os.environ.get("DELTA_LISTINGS_PAGINATION_STEP") else 1
+LISTINGS_TO_CHECK_PAGINATION_STEP = int(os.environ.get("LISTINGS_TO_CHECK_PAGINATION_STEP")) \
+    if os.environ.get("LISTINGS_TO_CHECK_PAGINATION_STEP") else 1
+MAKE_SNAPSHOT_STEP = int(os.environ.get("MAKE_SNAPSHOT_STEP")) if os.environ.get("MAKE_SNAPSHOT_STEP") else 1

@@ -2,5 +2,11 @@
 set -eu
 echo $DATE
 
-python3 -m playwright install firefox
-python main.py
+
+if [ "$FILE_TO_EXECUTE" == "main" ]; then
+    python3 -m playwright install firefox
+    python main.py
+else
+    python3 -m playwright install firefox
+    python pagination.py
+fi
