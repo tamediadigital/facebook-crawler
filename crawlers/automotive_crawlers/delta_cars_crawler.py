@@ -82,13 +82,13 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                         parsed_item = parse_car_regex(page.content(), item)
                         if parsed_item:
                             self.paginated_items.append(parsed_item)
-                    elif "login" in page_url and "next" in page_url:
-                        stdout_log.error(f"Proxy dead on url: {page.url}")
-                        page.close()
-                        browser.close()
-                        i -= 1
-                        error_happened = True
-                        break
+                    # elif "login" in page_url and "next" in page_url:
+                    #     stdout_log.error(f"Proxy dead on url: {page.url}")
+                    #     page.close()
+                    #     browser.close()
+                    #     i -= 1
+                    #     error_happened = True
+                    #     break
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()

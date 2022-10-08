@@ -81,13 +81,13 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                         stdout_log.info("Available listing.")
                         #  TODO: update cars with available data from page content
                         self.available_items.append(item)
-                    elif "login" in page_url and "next" in page_url:
-                        stdout_log.error(f"Proxy dead on url: {page.url}")
-                        page.close()
-                        browser.close()
-                        i -= 1
-                        error_happened = True
-                        break
+                    # elif "login" in page_url and "next" in page_url:
+                    #     stdout_log.error(f"Proxy dead on url: {page.url}")
+                    #     page.close()
+                    #     browser.close()
+                    #     i -= 1
+                    #     error_happened = True
+                    #     break
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()
