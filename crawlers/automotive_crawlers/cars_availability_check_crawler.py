@@ -65,7 +65,7 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                     stdout_log.info(f"PAGE GO TO: {url}")
                     page.set_default_timeout(60000)
                     page.goto(url, wait_until="load")
-                    time.sleep(5)
+                    time.sleep(4)
                     if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
                         page.click("span:text('Only allow essential cookies')")
@@ -76,18 +76,12 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                     # Not alive listing url example: "https://www.facebook.com/?next=%2Fmarketplace%2F"
                     # Available listing but bad proxy url example:
                     # "https://www.facebook.com/login/?next=https%3A%2F%2Fwww.facebook.com%2Fmarketplace%2Fitem%2F542404617581262"
+                    # With this condition we only paginate available listings
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
                         #  TODO: update cars with available data from page content
                         self.available_items.append(item)
-                    # elif "login" in page_url and "next" in page_url:
-                    #     stdout_log.error(f"Proxy dead on url: {page.url}")
-                    #     page.close()
-                    #     browser.close()
-                    #     i -= 1
-                    #     error_happened = True
-                    #     break
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()
