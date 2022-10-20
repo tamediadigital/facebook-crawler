@@ -45,7 +45,7 @@ REQUIRED_CITIES: list = os.environ.get("REQUIRED_CITIES").split("-") if os.envir
     else DEFAULT_REQUIRED_CITIES
 
 CATEGORY_TO_PROCESS = os.environ.get("CATEGORY_TO_PROCESS")
-MAX_PAGE_HEIGHT = os.environ.get("MAX_PAGE_HEIGHT")
+MAX_PAGE_HEIGHT = int(os.environ.get("MAX_PAGE_HEIGHT")) if os.environ.get("MAX_PAGE_HEIGHT") else 70000
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
