@@ -1,40 +1,30 @@
-import gzip
-import json
 import time
 
-
 from playwright.sync_api import sync_playwright
-from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
-from utils.logger import stdout_log
-from parsers.automotive_parsers import parse_car_regex
-from utils.proxy import Proxy
-from utils.retry_handler import retry
+from utils import BaseService, Proxy, stdout_log, retry
+from parsers import Parser
 from config import DATE
 
 
-class DeltaCarsCrawler(BaseCarsCrawler):
-    _FILE_NAME_PREFIX = "delta-listings"
+class DetailsCrawler(BaseService):
 
-    def __init__(self, proxy: Proxy):
-        super().__init__(proxy)
-        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
+    def __init__(self, proxy: Proxy, parser: Parser, category: str):
+        super().__init__()
+        self.proxy = proxy
+        self.parser = parser
+        self.category = category
+        self.items_to_paginate = self._read_file("delta-listings", category)
         self.paginated_items = []
-        self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
-
-    def _items_to_paginate(self, file_name_prefix: str) -> list:
-        y, m, d = DATE.split('-')
-        file_to_download = f"{file_name_prefix}-{y}-{m}-{d}.jsonl.gz"
-        self.s3_conn.download_file(file_to_download)
-        time.sleep(3)
-        _input = gzip.GzipFile(file_to_download, "rb")
-        return [json.loads(line) for line in _input.readlines()]
+        self.redis_key_for_urls_to_paginate = f"{category}-urls-to-paginate"
+        self.redis_client.insert_into_redis([item for item in self.items_to_paginate],
+                                            key=self.redis_key_for_urls_to_paginate)
 
     @retry(TimeoutError, stdout_log)
-    def get_details_for_delta_cars_process(self):
+    def pagination_process(self):
         playwright = sync_playwright().start()
         i = 0
         executed_chunk_items = 0
-        redis_items_to_paginate: list = self.redis_client.get_mappings(key="car-urls-to-paginate")
+        redis_items_to_paginate: list = self.redis_client.get_mappings(key=self.redis_key_for_urls_to_paginate)
         if redis_items_to_paginate:
             self.items_to_paginate = redis_items_to_paginate
         _items_to_paginate: list = self.items_to_paginate.copy()
@@ -80,7 +70,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
-                        parsed_item = parse_car_regex(page.content(), item)
+                        parsed_item = self.parser.parse_item(page.content(), item, self.category)
                         if parsed_item:
                             self.paginated_items.append(parsed_item)
                 except Exception as e:
@@ -94,7 +84,7 @@ class DeltaCarsCrawler(BaseCarsCrawler):
                 executed_chunk_items += 1
                 stdout_log.info(f"Executed chunk items {executed_chunk_items}")
                 _items_to_paginate.remove(item)
-                self.redis_client.insert_into_redis(_items_to_paginate, key="car-urls-to-paginate")
+                self.redis_client.insert_into_redis(_items_to_paginate, key=self.redis_key_for_urls_to_paginate)
 
             executed_chunk_items = 0 if not error_happened else executed_chunk_items
             stdout_log.info(f"Executed chunk items {executed_chunk_items}")
@@ -103,9 +93,9 @@ class DeltaCarsCrawler(BaseCarsCrawler):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
-        file_name: str = f"facebook-delta-paginated-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-paginated-delta-listings-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
-        stdout_log.info("Get details for delta cars process finished.")
+        stdout_log.info("Process: items_pagination_process finished.")
         time.sleep(2)
         playwright.stop()
         return self.paginated_items

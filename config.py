@@ -44,8 +44,8 @@ REQUIRED_RANGES_IN_KM: list = os.environ.get("REQUIRED_RANGES_IN_KM").split("-")
 REQUIRED_CITIES: list = os.environ.get("REQUIRED_CITIES").split("-") if os.environ.get("REQUIRED_CITIES") \
     else DEFAULT_REQUIRED_CITIES
 
-FB_BOT_EMAIL: str = os.environ.get(f"FB_BOT_EMAIL_{FB_BOT_CREDENTIALS_PAIR}")
-FB_BOT_PASS: str = os.environ.get(f"FB_BOT_PASS_{FB_BOT_CREDENTIALS_PAIR}")
+CATEGORY_TO_PROCESS = os.environ.get("CATEGORY_TO_PROCESS")
+MAX_PAGE_HEIGHT = os.environ.get("MAX_PAGE_HEIGHT")
 
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
@@ -74,9 +74,3 @@ PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
     if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20
-
-DELTA_LISTINGS_PAGINATION_STEP = int(os.environ.get("DELTA_LISTINGS_PAGINATION_STEP")) \
-    if os.environ.get("DELTA_LISTINGS_PAGINATION_STEP") else 1
-LISTINGS_TO_CHECK_PAGINATION_STEP = int(os.environ.get("LISTINGS_TO_CHECK_PAGINATION_STEP")) \
-    if os.environ.get("LISTINGS_TO_CHECK_PAGINATION_STEP") else 1
-MAKE_SNAPSHOT_STEP = int(os.environ.get("MAKE_SNAPSHOT_STEP")) if os.environ.get("MAKE_SNAPSHOT_STEP") else 1

@@ -1,24 +1,39 @@
 from typing import List
 
-from crawlers.automotive_crawlers.cars_availability_check_crawler import CarsAvailabilityCheckCrawler
-from crawlers.automotive_crawlers.delta_cars_crawler import DeltaCarsCrawler
-from crawlers.automotive_crawlers.scroll_cars_crawler import ScrollCarsCrawler
-from data_processor import DataProcessor
-from utils.proxy import Proxy
+from crawlers import ScrollCrawler, DetailsCrawler, AvailabilityCrawler
+from data_processing import DataProcessor
+from parsers import ScrollParser, AutomotiveParser, PropertyParser
+from utils import Proxy
 from config import SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS, SOCIAL_PROXY_KEY, \
-    SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR
+    SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR, CATEGORY_TO_PROCESS
 
 
 if __name__ == '__main__':
     proxy: Proxy = Proxy(SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS, SOCIAL_PROXY_KEY,
                          SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR)
-    ScrollCarsCrawler(proxy).scrolling_process()
 
-    data_processor = DataProcessor()
+    # Scroll step
+    scroll_parser = ScrollParser()
+    ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
+
+    # Data processing step
+    data_processor = DataProcessor(CATEGORY_TO_PROCESS)
     data_processor.listings_to_check()
     data_processor.delta_listings()
     overlap_listings = data_processor.overlap_listings()
 
-    delta_listings_with_details: List[dict] = DeltaCarsCrawler(proxy).get_details_for_delta_cars_process()
-    checked_listings: List[dict] = CarsAvailabilityCheckCrawler(proxy).cars_availability_check_process()
-    data_processor.make_snapshot(delta_listings_with_details, checked_listings, overlap_listings)
+    # Paginate delta listings step.
+    if CATEGORY_TO_PROCESS in ["vehicle", "cars"]:
+        delta_listings_parser = AutomotiveParser()
+    else:
+        delta_listings_parser = PropertyParser()
+
+    details_crawler = DetailsCrawler(proxy, delta_listings_parser, CATEGORY_TO_PROCESS)
+    delta_listings: List[dict] = details_crawler.pagination_process()
+
+    # Check listing availability step.
+    availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
+    available_listings: List[dict] = availability_crawler.availability_check_process()
+
+    # Make snapshot step.
+    data_processor.make_snapshot(delta_listings, available_listings, overlap_listings)

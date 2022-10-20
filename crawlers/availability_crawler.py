@@ -1,42 +1,29 @@
-import gzip
-import json
 import time
 
-
 from playwright.sync_api import sync_playwright
-from crawlers.automotive_crawlers.base_automotive_crawler import BaseCarsCrawler
-from utils.logger import stdout_log
-from utils.proxy import Proxy
-from utils.retry_handler import retry
+from utils import Proxy, BaseService, stdout_log, retry
 from config import DATE
 
 
-class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
-    _FILE_NAME_PREFIX = "listings-to-check"
-
-    def __init__(self, proxy: Proxy):
-        super().__init__(proxy)
-        self.items_to_paginate = self._items_to_paginate(self._FILE_NAME_PREFIX)
+class AvailabilityCrawler(BaseService):
+    def __init__(self, proxy: Proxy, category: str):
+        super().__init__()
+        self.proxy = proxy
+        self.category = category
+        self.items_to_check = self._read_file("listings-to-check", category)
         self.available_items = []
-        self.redis_client.insert_into_redis([item for item in self.items_to_paginate], key="car-urls-to-paginate")
-
-    def _items_to_paginate(self, file_name_prefix: str) -> list:
-        y, m, d = DATE.split('-')
-        file_to_download = f"{file_name_prefix}-{y}-{m}-{d}.jsonl.gz"
-        self.s3_conn.download_file(file_to_download)
-        time.sleep(3)
-        _input = gzip.GzipFile(file_to_download, "rb")
-        return [json.loads(line) for line in _input.readlines()]
+        self.redis_key_for_urls_to_check = f"{category}-urls-to-check"
+        self.redis_client.insert_into_redis([item for item in self.items_to_check], key=self.redis_key_for_urls_to_check)
 
     @retry(TimeoutError, stdout_log)
-    def cars_availability_check_process(self):
+    def availability_check_process(self):
         playwright = sync_playwright().start()
         i = 0
         executed_chunk_items = 0
-        redis_items_to_paginate: list = self.redis_client.get_mappings(key="car-urls-to-paginate")
-        if redis_items_to_paginate:
-            self.items_to_paginate = redis_items_to_paginate
-        _items_to_paginate: list = self.items_to_paginate.copy()
+        redis_items_to_check: list = self.redis_client.get_mappings(key=self.redis_key_for_urls_to_check)
+        if redis_items_to_check:
+            self.items_to_check = redis_items_to_check
+        _items_to_check: list = self.items_to_check.copy()
 
         while True:
             chunk_from = self.listings_num_per_proxy * i + executed_chunk_items
@@ -44,8 +31,8 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
             chunk_to = self.listings_num_per_proxy * (i + 1)
             stdout_log.info(f"chunk_to: {chunk_to}")
 
-            items_to_paginate: list = self.items_to_paginate[chunk_from:chunk_to]
-            if not _items_to_paginate:
+            items_to_check: list = self.items_to_check[chunk_from:chunk_to]
+            if not _items_to_check:
                 break
 
             browser = playwright.firefox.launch(headless=True, proxy={
@@ -58,12 +45,12 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
             i += 1
             cookie_accepted = False
             error_happened = False
-            for item in items_to_paginate:
+            for item in items_to_check:
                 page = i_context.new_page()
                 try:
                     url = item['url']
                     stdout_log.info(f"PAGE GO TO: {url}")
-                    page.set_default_timeout(60000)
+                    page.set_default_timeout(90000)
                     page.goto(url, wait_until="load")
                     time.sleep(4)
                     if not cookie_accepted and "next" not in page.url:
@@ -80,7 +67,6 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
-                        #  TODO: update cars with available data from page content
                         self.available_items.append(item)
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
@@ -92,8 +78,8 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
                 page.close()
                 executed_chunk_items += 1
                 stdout_log.info(f"Executed chunk items {executed_chunk_items}")
-                _items_to_paginate.remove(item)
-                self.redis_client.insert_into_redis(_items_to_paginate, key="car-urls-to-paginate")
+                _items_to_check.remove(item)
+                self.redis_client.insert_into_redis(_items_to_check, key=self.redis_key_for_urls_to_check)
 
             executed_chunk_items = 0 if not error_happened else executed_chunk_items
             stdout_log.info(f"Executed chunk items {executed_chunk_items}")
@@ -102,9 +88,9 @@ class CarsAvailabilityCheckCrawler(BaseCarsCrawler):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
-        file_name: str = f"facebook-available-cars-paginated-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-available-listings-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.available_items)
-        stdout_log.info("Cars availability check process finished.")
+        stdout_log.info(f"{self.category} availability check process finished.")
         time.sleep(2)
         playwright.stop()
         return self.available_items
