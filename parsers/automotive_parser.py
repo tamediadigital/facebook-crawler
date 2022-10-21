@@ -9,7 +9,10 @@ from parsers.base_parser import Parser
 class AutomotiveParser(Parser):
     def _parse_title(self, page_content: str):
         title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"')
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"')
+        if not title:
+            return
 
         if "Sold" in title:
             stdout_log.info("Listing is Sold!")
