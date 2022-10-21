@@ -76,7 +76,7 @@ class DataProcessor(BaseService):
         unique_listings: List[dict] = list(aggregated_unique_scroll_results.values())
         stdout_log.info(f"Unique items of aggregated scroll results -> len: {len(unique_listings)}")
 
-        if self.category == "vehicles":
+        if self.category == "vehicle":
             stdout_log("Excluding cars from vehicles.")
             car_items_from_today = self._read_file("cars", "snapshot-fb")
             cars_ids = [car["adId"] for car in car_items_from_today]
