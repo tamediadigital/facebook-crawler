@@ -78,7 +78,7 @@ class DataProcessor(BaseService):
 
         if self.category == "vehicle":
             stdout_log.info("Excluding cars from vehicles.")
-            car_items_from_today = self._read_file("cars", "snapshot-fb")
+            car_items_from_today = self._read_file("snapshot-fb", "cars")
             cars_ids = [car["adId"] for car in car_items_from_today]
 
             unique_swiss_listings: List[dict] = [item for item in unique_listings if item.get("cantonCode")
