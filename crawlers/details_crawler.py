@@ -1,4 +1,5 @@
 import time
+import random
 
 from playwright.sync_api import sync_playwright
 from utils import BaseService, Proxy, stdout_log, retry
@@ -55,7 +56,7 @@ class DetailsCrawler(BaseService):
                     url = item['url']
                     stdout_log.info(f"PAGE GO TO: {url}")
                     page.goto(url, wait_until="load", timeout=90000)
-                    time.sleep(4)
+                    time.sleep(random.choice(self.page_timeout_paginating_pool))
                     if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
                         page.click("span:text('Only allow essential cookies')")

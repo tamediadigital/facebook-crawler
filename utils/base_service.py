@@ -3,9 +3,10 @@ import json
 import time
 
 from typing import List
-from utils.logger import stdout_log
+from utils import stdout_log
 from db import s3_conn, redis_client
-from config import PAGE_HEIGHT_SCROLL_POOL, PAGE_TIMEOUT_SCROLL_POOL, DATE, LISTINGS_NUM_PER_PROXY
+from config import PAGE_HEIGHT_SCROLL_POOL, PAGE_TIMEOUT_SCROLL_POOL, DATE, LISTINGS_NUM_PER_PROXY, \
+    PAGE_TIMEOUT_PAGINATING_POOL
 
 
 class BaseService:
@@ -14,6 +15,7 @@ class BaseService:
         self.redis_client = redis_client
         self.page_height_scroll_pool = PAGE_HEIGHT_SCROLL_POOL
         self.page_timeout_scroll_pool = PAGE_TIMEOUT_SCROLL_POOL
+        self.page_timeout_paginating_pool = PAGE_TIMEOUT_PAGINATING_POOL
         self.listings_num_per_proxy = LISTINGS_NUM_PER_PROXY
 
     @staticmethod

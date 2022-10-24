@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict
 from utils import BaseService
 from db.s3_conn import s3_conn
-from utils import stdout_log
+from utils import stdout_log, slack_message_via_alertina
 from config import DATE, DEFAULT_REQUIRED_CITIES
 
 
@@ -116,3 +116,6 @@ class DataProcessor(BaseService):
         checked_listings = [self.previous_day_snapshot[item["adId"]] for item in checked_listings]
         snapshot_listings = list(itertools.chain.from_iterable([delta_listings, checked_listings, overlap_listings]))
         self._create_and_upload_file(f"{self.category}-snapshot-fb-{DATE}.jsonl.gz", snapshot_listings)
+
+        # Send message to slack chanel via Alertina.
+        slack_message_via_alertina(len(snapshot_listings))

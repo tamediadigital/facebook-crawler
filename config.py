@@ -50,6 +50,9 @@ MAX_PAGE_HEIGHT = int(os.environ.get("MAX_PAGE_HEIGHT")) if os.environ.get("MAX_
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
+ALERTINA_APP_ID = os.environ.get("ALERTINA_APP_ID")
+ALERTINA_URL = os.environ.get("ALERTINA_URL")
+
 S3_BUCKET = os.environ.get("BUCKET_NAME")
 S3_PREFIX = os.environ.get("S3_PREFIX")
 
@@ -71,6 +74,7 @@ if not DATE:
 PAGE_HEIGHT_SCROLL_POOL: List[int] = [15000, 15500, 16000, 16500, 17000, 17500, 18000, 18500, 19000, 19500, 20000,
                                       20500]
 PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
+PAGE_TIMEOUT_PAGINATING_POOL: List[int] = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3]
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
     if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20

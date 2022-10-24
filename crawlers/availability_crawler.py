@@ -1,3 +1,4 @@
+import random
 import time
 
 from playwright.sync_api import sync_playwright
@@ -52,7 +53,7 @@ class AvailabilityCrawler(BaseService):
                     stdout_log.info(f"PAGE GO TO: {url}")
                     page.set_default_timeout(90000)
                     page.goto(url, wait_until="load")
-                    time.sleep(4)
+                    time.sleep(random.choice(self.page_timeout_paginating_pool))
                     if not cookie_accepted and "next" not in page.url:
                         # Allow essential cookies step.
                         page.click("span:text('Only allow essential cookies')")
