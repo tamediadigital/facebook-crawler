@@ -3,7 +3,7 @@ import json
 import time
 
 from typing import List
-from utils import stdout_log
+from utils.logger import stdout_log
 from db import s3_conn, redis_client
 from config import PAGE_HEIGHT_SCROLL_POOL, PAGE_TIMEOUT_SCROLL_POOL, DATE, LISTINGS_NUM_PER_PROXY, \
     PAGE_TIMEOUT_PAGINATING_POOL

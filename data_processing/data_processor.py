@@ -7,9 +7,8 @@ import time
 
 from datetime import datetime, timedelta
 from typing import List, Dict
-from utils import BaseService
 from db.s3_conn import s3_conn
-from utils import stdout_log, slack_message_via_alertina
+from utils import BaseService, stdout_log, slack_message_via_alertina
 from config import DATE, DEFAULT_REQUIRED_CITIES
 
 
