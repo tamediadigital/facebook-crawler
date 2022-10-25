@@ -74,7 +74,7 @@ if not DATE:
 PAGE_HEIGHT_SCROLL_POOL: List[int] = [15000, 15500, 16000, 16500, 17000, 17500, 18000, 18500, 19000, 19500, 20000,
                                       20500]
 PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
-PAGE_TIMEOUT_PAGINATING_POOL: List[int] = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5]
+PAGE_TIMEOUT_PAGINATING_POOL: List[int] = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
     if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20
