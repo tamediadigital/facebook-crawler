@@ -32,8 +32,11 @@ if __name__ == '__main__':
     delta_listings: List[dict] = details_crawler.pagination_process()
 
     # Check listing availability step.
-    availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
-    available_listings: List[dict] = availability_crawler.availability_check_process()
+    if CATEGORY_TO_PROCESS != "vehicle":
+        availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
+        available_listings: List[dict] = availability_crawler.availability_check_process()
+    else:
+        available_listings = data_processor.listings_to_check()
 
     # Make snapshot step.
     data_processor.make_snapshot(delta_listings, available_listings, overlap_listings)

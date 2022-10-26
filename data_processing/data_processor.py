@@ -95,6 +95,7 @@ class DataProcessor(BaseService):
                                           if _id not in self.scroll_results_from_today_ids]
         file_name: str = f"{self.category}-listings-to-check-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, not_found_listings)
+        return not_found_listings
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
