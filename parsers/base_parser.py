@@ -3,6 +3,7 @@ import re
 
 from abc import ABC
 from typing import List
+from utils import stdout_log
 
 
 class Parser(ABC):
@@ -19,6 +20,23 @@ class Parser(ABC):
         if not result:
             return
         return result.group(1)
+
+    def _parse_title(self, page_content: str):
+        title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"')
+        if not title:
+            return
+
+        if "Sold" in title:
+            stdout_log.info("Listing is Sold!")
+            return
+        return title
+
+    def _parse_description(self, page_content: str):
+        description: str = self._regex_search_between(page_content, '"redacted_description":{"text":"', '"},"creation_time"')
+        return description
 
     def _parse_seller(self, page_content: str):
         res = self._regex_search_between(page_content, '"actors":', ',"__isEntity"')

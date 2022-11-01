@@ -7,22 +7,6 @@ from parsers.base_parser import Parser
 
 
 class AutomotiveParser(Parser):
-    def _parse_title(self, page_content: str):
-        title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"')
-        if not title:
-            return
-
-        if "Sold" in title:
-            stdout_log.info("Listing is Sold!")
-            return
-        return title
-
-    def _parse_description(self, page_content: str):
-        description: str = self._regex_search_between(page_content, '"redacted_description":{"text":"', '"},"creation_time"')
-        return description
-
     def _parse_available_from(self, page_content: str):
         _available_from = self._regex_search_between(page_content, '"creation_time":', ',"location_text"')
         available_from = str(datetime.fromtimestamp(int(_available_from))) if _available_from else None
@@ -88,7 +72,6 @@ class AutomotiveParser(Parser):
         record.imageLinks = self._parse_image_links(page_content)
         record.availableFrom = self._parse_available_from(page_content)
         record.isBoosted = self._parse_is_boosted(page_content)
-        record.availableFrom = self._parse_available_from(page_content)
 
         if self._parse_seller(page_content):
             seller_id, seller_name, seller_type = self._parse_seller(page_content)

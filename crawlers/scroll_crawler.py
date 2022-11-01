@@ -93,20 +93,22 @@ class ScrollCrawler(BaseService):
                         time.sleep(2)
                         page.click("span:text('Shop by category')")
                         time.sleep(5)
+                    elif self.cat_to_scroll in ['propertyrentals', 'propertyforsale']:
+                        page.mouse.move(600, 0)
+                        stdout_log.info(f"{self.cat_to_scroll} and mouse is moved to the right to be able to scroll.")
 
                     # Scroll step.
                     page_height_after_scroll: int = 0
                     page_height: int = 1
                     while True:
-                        stdout_log.info(f"Page height {page_height}")
                         if page_height == page_height_after_scroll:
                             stdout_log.info("Same page height before and after scroll stopped scrolling!")
-                            if page_height < 2000:
-                                raise Exception()
+                            stdout_log.info(f"Page height {page_height}")
+                            time.sleep(1)
                             break
 
                         if page_height > self.max_page_height:
-                            stdout_log.info(f"MAx page height {self.max_page_height} stopped scrolling!")
+                            stdout_log.info(f"Max page height {self.max_page_height} stopped scrolling!")
                             break
 
                         page_height = page.evaluate('(window.innerHeight + window.scrollY)')

@@ -118,4 +118,5 @@ class DataProcessor(BaseService):
         self._create_and_upload_file(f"{self.category}-snapshot-fb-{DATE}.jsonl.gz", snapshot_listings)
 
         # Send message to slack chanel via Alertina.
-        slack_message_via_alertina(len(snapshot_listings))
+        slack_message_via_alertina(len(snapshot_listings), len(delta_listings), len(checked_listings),
+                                   len(overlap_listings))
