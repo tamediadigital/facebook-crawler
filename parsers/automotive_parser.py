@@ -2,7 +2,6 @@ import json
 
 from datetime import datetime
 from schemas import AutomotiveRecord
-from utils import stdout_log
 from parsers.base_parser import Parser
 
 

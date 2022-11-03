@@ -1,11 +1,11 @@
-import itertools
 import time
 import random
+import itertools
 
 from typing import List
-from playwright.sync_api import sync_playwright
-from utils import BaseService, Proxy, stdout_log, retry
 from parsers import Parser
+from playwright.sync_api import sync_playwright
+from utils import BaseService, Proxy, stdout_log, retry, CATEGORIES
 from config import CITIES_CITIES_CODE_MAP, DATE, REQUIRED_CITIES, PRICE_COMBINATIONS, MAX_PAGE_HEIGHT
 
 
@@ -65,7 +65,7 @@ class ScrollCrawler(BaseService):
                 page = browser.new_page()
 
                 try:
-                    if self.cat_to_scroll == "vehicle":
+                    if self.cat_to_scroll == CATEGORIES.VEHICLE:
                         start_url: str = f"https://www.facebook.com/marketplace/{city_code}"
                     else:
                         start_url: str = f"https://www.facebook.com/marketplace/{city_code}/{self.cat_to_scroll}/{p_comb}"
@@ -81,7 +81,7 @@ class ScrollCrawler(BaseService):
                     stdout_log.info("Essential cookies step completed.")
                     stdout_log.info(f"PAGE ON URL: {page.url}")
 
-                    if self.cat_to_scroll == "vehicle":
+                    if self.cat_to_scroll == CATEGORIES.VEHICLE:
                         prices = p_comb.split("=")
                         min_price = prices[0]
                         max_price = prices[1]
@@ -93,7 +93,7 @@ class ScrollCrawler(BaseService):
                         time.sleep(2)
                         page.click("span:text('Shop by category')")
                         time.sleep(5)
-                    elif self.cat_to_scroll in ['propertyrentals', 'propertyforsale']:
+                    elif self.cat_to_scroll in [CATEGORIES.PROPERTY_FOR_RENT, CATEGORIES.PROPERTY_FOR_SALE]:
                         page.mouse.move(600, 0)
                         stdout_log.info(f"{self.cat_to_scroll} and mouse is moved to the right to be able to scroll.")
 

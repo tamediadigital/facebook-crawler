@@ -2,7 +2,7 @@ import random
 import time
 
 from playwright.sync_api import sync_playwright
-from utils import Proxy, BaseService, stdout_log, retry
+from utils import Proxy, BaseService, stdout_log, retry, LISTINGS
 from config import DATE
 
 
@@ -11,7 +11,7 @@ class AvailabilityCrawler(BaseService):
         super().__init__()
         self.proxy = proxy
         self.category = category
-        self.items_to_check = self._read_file("listings-to-check", category)
+        self.items_to_check = self._read_file(LISTINGS.TO_CHECK, category)
         self.available_items = []
         self.redis_key_for_urls_to_check = f"{category}-urls-to-check"
         self.redis_client.insert_into_redis([item for item in self.items_to_check], key=self.redis_key_for_urls_to_check)
@@ -89,7 +89,7 @@ class AvailabilityCrawler(BaseService):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
-        file_name: str = f"{self.category}-available-listings-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.AVAILABLE}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.available_items)
         stdout_log.info(f"{self.category} availability check process finished.")
         time.sleep(2)

@@ -2,7 +2,7 @@ import time
 import random
 
 from playwright.sync_api import sync_playwright
-from utils import BaseService, Proxy, stdout_log, retry
+from utils import BaseService, Proxy, stdout_log, retry, LISTINGS
 from parsers import Parser
 from config import DATE
 
@@ -14,7 +14,7 @@ class DetailsCrawler(BaseService):
         self.proxy = proxy
         self.parser = parser
         self.category = category
-        self.items_to_paginate = self._read_file("delta-listings", category)
+        self.items_to_paginate = self._read_file(LISTINGS.DELTA, category)
         self.paginated_items = []
         self.redis_key_for_urls_to_paginate = f"{category}-urls-to-paginate"
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate],
@@ -94,7 +94,7 @@ class DetailsCrawler(BaseService):
             # Call rotate proxy.
             self.proxy.rotate_proxy_call()
 
-        file_name: str = f"{self.category}-paginated-delta-listings-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.PAGINATED_DELTA}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)
         stdout_log.info("Process: items_pagination_process finished.")
         time.sleep(2)

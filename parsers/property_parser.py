@@ -7,6 +7,7 @@ from schemas.property_schemas import PropertyForSale, PropertyForRent
 
 
 class PropertyParser(Parser):
+
     @staticmethod
     def _parse_available_from(availability_string: str):
         time_period = 0

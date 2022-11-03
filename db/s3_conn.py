@@ -17,11 +17,6 @@ class S3Conn:
         self.s3.upload_file(file, S3_BUCKET, full_path)
         stdout_log.info(f"File {full_path} uploaded on s3.")
 
-    def upload_file_v2(self, file_path: str, file: str):
-
-        self.s3.upload_file(file, S3_BUCKET, f"{S3_PREFIX}/{file_path}/{file}")
-        stdout_log.info(f"File {file_path} uploaded on s3.")
-
     def download_file(self, file_name: str, download_in_past=0, per_city=False):
         date = DATE
         if download_in_past:
@@ -33,6 +28,12 @@ class S3Conn:
             f"{S3_PREFIX}/year={year}/month={month}/day={day}/{file_name}"
         stdout_log.info(f"Downloading: {full_path} from s3.")
         self.s3.download_file(S3_BUCKET, full_path, file_name)
+
+    def delete_file(self, file_name):
+        year, month, day = DATE.split('-')
+        self.s3.delete_object(Bucket=S3_BUCKET, Key=f"{S3_PREFIX}/year={year}/month={month}/day={day}/{file_name}")
+        stdout_log.info(f"File: {file_name} deleted from s3.")
+        stdout_log.info(f"{S3_PREFIX}/year={year}/month={month}/day={day}/{file_name}")
 
 
 s3_conn = S3Conn()

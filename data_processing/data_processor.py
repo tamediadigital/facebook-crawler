@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timedelta
 from typing import List, Dict
 from db.s3_conn import s3_conn
-from utils import BaseService, stdout_log, slack_message_via_alertina
+from utils import BaseService, stdout_log, slack_message_via_alertina, CATEGORIES, LISTINGS
 from config import DATE, DEFAULT_REQUIRED_CITIES
 
 
@@ -53,7 +53,7 @@ class DataProcessor(BaseService):
     def _get_previous_day_snapshot(self, date) -> Dict[str, dict]:
         _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)
         year, month, day = _date.strftime("%Y-%m-%d").split('-')
-        file_name: str = f"{self.category}-snapshot-fb-{year}-{month}-{day}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.SNAPSHOT}-{year}-{month}-{day}.jsonl.gz"
         s3_conn.download_file(file_name, 1)
         time.sleep(2)
         _input = gzip.GzipFile(file_name, "rb")
@@ -75,7 +75,7 @@ class DataProcessor(BaseService):
         unique_listings: List[dict] = list(aggregated_unique_scroll_results.values())
         stdout_log.info(f"Unique items of aggregated scroll results -> len: {len(unique_listings)}")
 
-        if self.category == "vehicle":
+        if self.category == CATEGORIES.VEHICLE:
             stdout_log.info("Excluding cars from vehicles.")
             car_items_from_today = self._read_file("snapshot-fb", "cars")
             cars_ids = [car["adId"] for car in car_items_from_today]
@@ -93,7 +93,7 @@ class DataProcessor(BaseService):
         """Creates output file from listings which are in snapshot T-1 but not in scroll T0."""
         not_found_listings: List[dict] = [value for _id, value in self.previous_day_snapshot.items()
                                           if _id not in self.scroll_results_from_today_ids]
-        file_name: str = f"{self.category}-listings-to-check-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.TO_CHECK}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, not_found_listings)
         return not_found_listings
 
@@ -101,21 +101,26 @@ class DataProcessor(BaseService):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
         delta_listings: List[dict] = [record for record in self.scroll_results_from_today
                                       if record["adId"] not in self.previous_day_snapshot_ids]
-        file_name: str = f"{self.category}-delta-listings-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.DELTA}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, delta_listings)
 
     def overlap_listings(self):
         """Creates output file from listings which are bot in T-1 snapshot and T0 scroll."""
         overlap_listings: List[dict] = [record for _id, record in self.previous_day_snapshot.items()
                                         if _id in self.scroll_results_from_today_ids]
-        file_name: str = f"{self.category}-overlap-listings-{DATE}.jsonl.gz"
+        file_name: str = f"{self.category}-{LISTINGS.OVERLAP}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, overlap_listings)
         return overlap_listings
 
     def make_snapshot(self, delta_listings, checked_listings, overlap_listings):
         checked_listings = [self.previous_day_snapshot[item["adId"]] for item in checked_listings]
         snapshot_listings = list(itertools.chain.from_iterable([delta_listings, checked_listings, overlap_listings]))
-        self._create_and_upload_file(f"{self.category}-snapshot-fb-{DATE}.jsonl.gz", snapshot_listings)
+        self._create_and_upload_file(f"{self.category}-{LISTINGS.SNAPSHOT}-{DATE}.jsonl.gz", snapshot_listings)
+
+        # Delete helper/necessary files.
+        for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
+                          LISTINGS.AVAILABLE]:
+            self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
 
         # Send message to slack chanel via Alertina.
         slack_message_via_alertina(len(snapshot_listings), len(delta_listings), len(checked_listings),
