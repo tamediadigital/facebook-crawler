@@ -46,12 +46,11 @@ class DetailsCrawler(BaseService):
                 "password": self.proxy.password
                 })
             i_context = browser.new_context()
-
+            page = i_context.new_page()
             i += 1
             cookie_accepted = False
             error_happened = False
             for item in items_to_paginate:
-                page = i_context.new_page()
                 try:
                     url = item['url']
                     stdout_log.info(f"PAGE GO TO: {url}")
@@ -70,7 +69,7 @@ class DetailsCrawler(BaseService):
                     # With this condition we only paginate available listings
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
-                        stdout_log.info("Available listing.")
+                        stdout_log.info("Collecting listing details.")
                         parsed_item = self.parser.parse_item(page.content(), item, self.category)
                         if parsed_item:
                             self.paginated_items.append(parsed_item)
@@ -81,7 +80,7 @@ class DetailsCrawler(BaseService):
                     i -= 1
                     error_happened = True
                     break
-                page.close()
+
                 executed_chunk_items += 1
                 stdout_log.info(f"Executed chunk items {executed_chunk_items}")
                 _items_to_paginate.remove(item)
@@ -89,6 +88,7 @@ class DetailsCrawler(BaseService):
 
             executed_chunk_items = 0 if not error_happened else executed_chunk_items
             stdout_log.info(f"Executed chunk items {executed_chunk_items}")
+            page.close()
             browser.close()
 
             # Call rotate proxy.

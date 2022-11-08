@@ -30,5 +30,9 @@ class Proxy:
             stdout_log.info(f"Proxy endpoint bad response, {response}.")
             return
 
-        proxy_list: list = json.loads(response)
-        stdout_log.info(proxy_list)
+        # TODO: Handle this better.
+        try:
+            proxy_list: list = json.loads(response)
+            stdout_log.info(proxy_list)
+        except:
+            stdout_log.info(f"Proxy endpoint bad response.")

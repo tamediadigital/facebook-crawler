@@ -2,7 +2,7 @@ import random
 import time
 
 from playwright.sync_api import sync_playwright
-from utils import Proxy, BaseService, stdout_log, retry, LISTINGS
+from utils import Proxy, BaseService, stdout_log, retry, LISTINGS, regex_search_between
 from config import DATE
 
 
@@ -15,6 +15,20 @@ class AvailabilityCrawler(BaseService):
         self.available_items = []
         self.redis_key_for_urls_to_check = f"{category}-urls-to-check"
         self.redis_client.insert_into_redis([item for item in self.items_to_check], key=self.redis_key_for_urls_to_check)
+
+    @staticmethod
+    def _is_sold(page_content: str):
+        title: str = regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
+                     regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
+                     regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
+                     regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"')
+        if not title:
+            return True
+
+        if "Sold" in title:
+            stdout_log.info("Listing is Sold!")
+            return True
+        return False
 
     @retry(TimeoutError, stdout_log)
     def availability_check_process(self):
@@ -68,7 +82,9 @@ class AvailabilityCrawler(BaseService):
                     page_url = page.url
                     if "login" not in page_url and "next" not in page_url:
                         stdout_log.info("Available listing.")
-                        self.available_items.append(item)
+                        # Here we are checking if listing contains mark "Sold" in title if contains we are excluding it.
+                        if not self._is_sold(page.content()):
+                            self.available_items.append(item)
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")
                     page.close()

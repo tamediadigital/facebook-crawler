@@ -77,4 +77,4 @@ PAGE_TIMEOUT_SCROLL_POOL: List[int] = [4, 4.5, 5, 5.5, 6.5, 7, 7.5]
 PAGE_TIMEOUT_PAGINATING_POOL: List[int] = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2, 1.3, 1.4, 1.5]
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
-    if os.environ.get("LISTINGS_NUM_PER_PROXY") else 20
+    if os.environ.get("LISTINGS_NUM_PER_PROXY") else 50
