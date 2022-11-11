@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
     # Data processing step
     data_processor = DataProcessor(CATEGORY_TO_PROCESS)
-    data_processor.listings_to_check()
+    listing_not_to_check = data_processor.listings_to_check()
     data_processor.delta_listings()
     overlap_listings = data_processor.overlap_listings()
 
@@ -39,4 +39,4 @@ if __name__ == '__main__':
         available_listings = data_processor.listings_to_check()
 
     # Make snapshot step.
-    data_processor.make_snapshot(delta_listings, available_listings, overlap_listings)
+    data_processor.make_snapshot(delta_listings, available_listings, overlap_listings, listing_not_to_check)

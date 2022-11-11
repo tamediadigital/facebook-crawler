@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict
 from db.s3_conn import s3_conn
 from utils import BaseService, stdout_log, slack_message_via_alertina, CATEGORIES, LISTINGS
-from config import DATE, DEFAULT_REQUIRED_CITIES
+from config import DATE, DEFAULT_REQUIRED_CITIES, LISTINGS_TO_CHECK_SIZE
 
 
 class DataProcessor(BaseService):
@@ -93,9 +93,31 @@ class DataProcessor(BaseService):
         """Creates output file from listings which are in snapshot T-1 but not in scroll T0."""
         not_found_listings: List[dict] = [value for _id, value in self.previous_day_snapshot.items()
                                           if _id not in self.scroll_results_from_today_ids]
+
+        listings_with_available_from_field = []
+        rest_of_the_listings = []
+        for listing in not_found_listings:
+            if listing.get("availableFrom"):
+                listings_with_available_from_field.append(listing)
+            else:
+                rest_of_the_listings.append(listing)
+
+        listings_len = len(listings_with_available_from_field)
+        listings_num_to_slice = LISTINGS_TO_CHECK_SIZE if listings_len > LISTINGS_TO_CHECK_SIZE else listings_len
+        sorted_listings = sorted(listings_with_available_from_field, key=lambda d: d['availableFrom'])
+        listings_to_check = sorted_listings[:listings_num_to_slice]
+        rest_from_sorted = sorted_listings[listings_num_to_slice:]
+        for rfs in rest_from_sorted:
+            rest_of_the_listings.append(rfs)
+
+        # Upload file with selected listings to check.
         file_name: str = f"{self.category}-{LISTINGS.TO_CHECK}-{DATE}.jsonl.gz"
-        self._create_and_upload_file(file_name, not_found_listings)
-        return not_found_listings
+        self._create_and_upload_file(file_name, listings_to_check)
+
+        # Upload file with all others listings which we are considering alive for the snapshot.
+        other_file_name: str = f"{self.category}-{LISTINGS.NOT_TO_CHECK}-{DATE}.jsonl.gz"
+        self._create_and_upload_file(other_file_name, rest_of_the_listings)
+        return rest_of_the_listings
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
@@ -112,16 +134,17 @@ class DataProcessor(BaseService):
         self._create_and_upload_file(file_name, overlap_listings)
         return overlap_listings
 
-    def make_snapshot(self, delta_listings, checked_listings, overlap_listings):
+    def make_snapshot(self, delta_listings, checked_listings, overlap_listings, listing_not_to_check):
         checked_listings = [self.previous_day_snapshot[item["adId"]] for item in checked_listings]
-        snapshot_listings = list(itertools.chain.from_iterable([delta_listings, checked_listings, overlap_listings]))
+        snapshot_listings = list(itertools.chain.from_iterable([delta_listings, checked_listings, overlap_listings,
+                                                                listing_not_to_check]))
         self._create_and_upload_file(f"{self.category}-{LISTINGS.SNAPSHOT}-{DATE}.jsonl.gz", snapshot_listings)
 
         # Delete helper/necessary files.
         for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
-                          LISTINGS.AVAILABLE]:
+                          LISTINGS.AVAILABLE, LISTINGS.NOT_TO_CHECK]:
             self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
 
         # Send message to slack chanel via Alertina.
         slack_message_via_alertina(len(snapshot_listings), len(delta_listings), len(checked_listings),
-                                   len(overlap_listings))
+                                   len(overlap_listings), len(listing_not_to_check))

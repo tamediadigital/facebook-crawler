@@ -12,6 +12,7 @@ class CategoriesToProcess:
 @dataclass
 class Listings:
     TO_CHECK: str = "listings-to-check"
+    NOT_TO_CHECK: str = "listings-not-to-check"
     DELTA: str = "delta-listings"
     OVERLAP: str = "overlap-listings"
     SNAPSHOT: str = "snapshot-fb"

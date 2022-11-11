@@ -78,3 +78,6 @@ PAGE_TIMEOUT_PAGINATING_POOL: List[int] = [0.5, 0.6, 0.7, 0.8, 0.9, 1, 1.1, 1.2,
 
 LISTINGS_NUM_PER_PROXY = int(os.environ.get("LISTINGS_NUM_PER_PROXY")) \
     if os.environ.get("LISTINGS_NUM_PER_PROXY") else 50
+
+LISTINGS_TO_CHECK_SIZE = int(os.environ.get("LISTINGS_TO_CHECK_SIZE")) \
+    if os.environ.get("LISTINGS_TO_CHECK_SIZE") else 8000
