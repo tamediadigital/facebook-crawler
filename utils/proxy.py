@@ -25,13 +25,9 @@ class Proxy:
             'Content-Type': 'application/json'
             }
 
-        response = requests.request("GET", url, headers=headers, data=payload).text
-        if not response:
-            stdout_log.info(f"Proxy endpoint bad response, {response}.")
-            return
-
         # TODO: Handle this better.
         try:
+            response = requests.request("GET", url, headers=headers, data=payload).text
             proxy_list: list = json.loads(response)
             stdout_log.info(proxy_list)
         except:
