@@ -13,10 +13,8 @@ if __name__ == '__main__':
                          SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR)
 
     # Scroll step
-    # TODO: just for "2022-11-16" data will be prepared, and no need to be generated,
-    # TODO: uncomment this before merge to prod
-    # scroll_parser = ScrollParser()
-    # ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
+    scroll_parser = ScrollParser()
+    ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
 
     # Data processing step
     data_processor = DataProcessor(CATEGORY_TO_PROCESS)

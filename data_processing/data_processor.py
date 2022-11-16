@@ -121,13 +121,10 @@ class DataProcessor(BaseService):
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
-        # TODO: just for "2022-11-16" delta will be prepared, and no need to be generated,
-        # TODO: uncomment this before merge to prod
-        # delta_listings: List[dict] = [record for record in self.scroll_results_from_today
-        #                               if record["adId"] not in self.previous_day_snapshot_ids]
-        # file_name: str = f"{self.category}-{LISTINGS.DELTA}-{DATE}.jsonl.gz"
-        # self._create_and_upload_file(file_name, delta_listings)
-        pass
+        delta_listings: List[dict] = [record for record in self.scroll_results_from_today
+                                      if record["adId"] not in self.previous_day_snapshot_ids]
+        file_name: str = f"{self.category}-{LISTINGS.DELTA}-{DATE}.jsonl.gz"
+        self._create_and_upload_file(file_name, delta_listings)
 
     def overlap_listings(self):
         """Creates output file from listings which are bot in T-1 snapshot and T0 scroll."""
