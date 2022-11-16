@@ -21,9 +21,14 @@ class Parser(ABC):
         title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
                      self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
                      self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"')
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"') or \
+                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Cars & Trucks') or \
+                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Miscellaneous') or \
+                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Property Rentals') or \
+                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Property For Sale')
+
         if not title:
-            return
+            return "No title found with regex!"
 
         if "Sold" in title:
             stdout_log.info("Listing is Sold!")

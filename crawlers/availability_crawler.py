@@ -18,13 +18,16 @@ class AvailabilityCrawler(BaseService):
 
     @staticmethod
     def _is_sold(page_content: str):
-        title: str = regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
+        _title: str = regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
                      regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
                      regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
-                     regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"')
-        if not title:
-            return True
+                     regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"') or \
+                     regex_search_between(page_content, '"meta":{"title":"', ' - Cars & Trucks') or \
+                     regex_search_between(page_content, '"meta":{"title":"', ' - Miscellaneous') or \
+                     regex_search_between(page_content, '"meta":{"title":"', ' - Property Rentals') or \
+                     regex_search_between(page_content, '"meta":{"title":"', ' - Property For Sale')
 
+        title = _title if _title else ""
         if "Sold" in title:
             stdout_log.info("Listing is Sold!")
             return True

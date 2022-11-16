@@ -121,10 +121,13 @@ class DataProcessor(BaseService):
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
-        delta_listings: List[dict] = [record for record in self.scroll_results_from_today
-                                      if record["adId"] not in self.previous_day_snapshot_ids]
-        file_name: str = f"{self.category}-{LISTINGS.DELTA}-{DATE}.jsonl.gz"
-        self._create_and_upload_file(file_name, delta_listings)
+        # TODO: just for "2022-11-16" delta will be prepared, and no need to be generated,
+        # TODO: uncomment this before merge to prod
+        # delta_listings: List[dict] = [record for record in self.scroll_results_from_today
+        #                               if record["adId"] not in self.previous_day_snapshot_ids]
+        # file_name: str = f"{self.category}-{LISTINGS.DELTA}-{DATE}.jsonl.gz"
+        # self._create_and_upload_file(file_name, delta_listings)
+        pass
 
     def overlap_listings(self):
         """Creates output file from listings which are bot in T-1 snapshot and T0 scroll."""
@@ -140,10 +143,11 @@ class DataProcessor(BaseService):
                                                                 listing_not_to_check]))
         self._create_and_upload_file(f"{self.category}-{LISTINGS.SNAPSHOT}-{DATE}.jsonl.gz", snapshot_listings)
 
+        # TODO: uncomment this in the when crawler became stabile
         # Delete helper/necessary files.
-        for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
-                          LISTINGS.AVAILABLE, LISTINGS.NOT_TO_CHECK]:
-            self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
+        # for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
+        #                   LISTINGS.AVAILABLE, LISTINGS.NOT_TO_CHECK]:
+        #     self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
 
         # Send message to slack chanel via Alertina.
         slack_message_via_alertina(len(snapshot_listings), len(delta_listings), len(checked_listings),
