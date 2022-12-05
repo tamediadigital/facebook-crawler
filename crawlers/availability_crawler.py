@@ -1,9 +1,10 @@
 import random
 import time
 
+from config import DATE
+from datetime import datetime
 from playwright.sync_api import sync_playwright
 from utils import Proxy, BaseService, stdout_log, retry, LISTINGS, regex_search_between
-from config import DATE
 
 
 class AvailabilityCrawler(BaseService):
@@ -87,6 +88,7 @@ class AvailabilityCrawler(BaseService):
                         stdout_log.info("Available listing.")
                         # Here we are checking if listing contains mark "Sold" in title if contains we are excluding it.
                         if not self._is_sold(page.content()):
+                            item['last_check'] = str(datetime.now())
                             self.available_items.append(item)
                 except Exception as e:
                     stdout_log.error(f"Error occurs! {e}")

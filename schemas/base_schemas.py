@@ -21,6 +21,7 @@ class BaseRecord(BaseModel):
     sellerId: str = None
     sellerName: str = None
     sellerType: str = None
+    last_check: str = str(datetime.now())
 
 
 class RecordFromScroll(BaseModel):

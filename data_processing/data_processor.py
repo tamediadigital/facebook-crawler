@@ -94,21 +94,11 @@ class DataProcessor(BaseService):
         not_found_listings: List[dict] = [value for _id, value in self.previous_day_snapshot.items()
                                           if _id not in self.scroll_results_from_today_ids]
 
-        listings_with_available_from_field = []
-        rest_of_the_listings = []
-        for listing in not_found_listings:
-            if listing.get("availableFrom"):
-                listings_with_available_from_field.append(listing)
-            else:
-                rest_of_the_listings.append(listing)
-
-        listings_len = len(listings_with_available_from_field)
+        listings_len = len(not_found_listings)
         listings_num_to_slice = LISTINGS_TO_CHECK_SIZE if listings_len > LISTINGS_TO_CHECK_SIZE else listings_len
-        sorted_listings = sorted(listings_with_available_from_field, key=lambda d: d['availableFrom'])
+        sorted_listings = sorted(not_found_listings, key=lambda d: d['last_check'], reverse=True)
         listings_to_check = sorted_listings[:listings_num_to_slice]
-        rest_from_sorted = sorted_listings[listings_num_to_slice:]
-        for rfs in rest_from_sorted:
-            rest_of_the_listings.append(rfs)
+        listings_not_to_check = sorted_listings[listings_num_to_slice:]
 
         # Upload file with selected listings to check.
         file_name: str = f"{self.category}-{LISTINGS.TO_CHECK}-{DATE}.jsonl.gz"
@@ -116,8 +106,8 @@ class DataProcessor(BaseService):
 
         # Upload file with all others listings which we are considering alive for the snapshot.
         other_file_name: str = f"{self.category}-{LISTINGS.NOT_TO_CHECK}-{DATE}.jsonl.gz"
-        self._create_and_upload_file(other_file_name, rest_of_the_listings)
-        return rest_of_the_listings
+        self._create_and_upload_file(other_file_name, listings_not_to_check)
+        return listings_not_to_check
 
     def delta_listings(self):
         """Creates output file from listings which are in T0 scroll but not in T-1 snapshot (delta)."""
