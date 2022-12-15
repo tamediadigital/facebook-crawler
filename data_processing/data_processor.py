@@ -130,11 +130,10 @@ class DataProcessor(BaseService):
                                                                 listing_not_to_check]))
         self._create_and_upload_file(f"{self.category}-{LISTINGS.SNAPSHOT}-{DATE}.jsonl.gz", snapshot_listings)
 
-        # TODO: uncomment this in the when crawler became stabile
         # Delete helper/necessary files.
-        # for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
-        #                   LISTINGS.AVAILABLE, LISTINGS.NOT_TO_CHECK]:
-        #     self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
+        for file_name in [LISTINGS.DELTA, LISTINGS.PAGINATED_DELTA, LISTINGS.OVERLAP, LISTINGS.TO_CHECK,
+                          LISTINGS.AVAILABLE, LISTINGS.NOT_TO_CHECK]:
+            self.s3_conn.delete_file(f"{self.category}-{file_name}-{DATE}.jsonl.gz")
 
         # Send message to slack chanel via Alertina.
         slack_message_via_alertina(len(snapshot_listings), len(delta_listings), len(checked_listings),
