@@ -66,7 +66,7 @@ class AutomotiveParser(Parser):
         record = AutomotiveRecord(**scroll_record)
 
         record.vehicleType = category
-        record.title = self._parse_title(page_content)
+        record.title = self._parse_title(page_content, ad_id=scroll_record['adId'])
         record.description = self._parse_description(page_content)
         record.imageLinks = self._parse_image_links(page_content)
         record.availableFrom = self._parse_available_from(page_content)

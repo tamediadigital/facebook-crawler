@@ -64,7 +64,7 @@ class PropertyParser(Parser):
         else:
             record = PropertyForSale(**scroll_record)
 
-        record.title = self._parse_title(page_content)
+        record.title = self._parse_title(page_content, ad_id=scroll_record['adId'])
         record.description = self._parse_description(page_content)
         record.imageLinks = self._parse_image_links(page_content)
         record.isBoosted = self._parse_is_boosted(page_content)

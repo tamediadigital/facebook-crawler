@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict
 from db.s3_conn import s3_conn
 from utils import BaseService, stdout_log, slack_message_via_alertina, CATEGORIES, LISTINGS
-from config import DATE, DEFAULT_REQUIRED_CITIES, LISTINGS_TO_CHECK_SIZE
+from config import DATE, DEFAULT_REQUIRED_CITIES, LISTINGS_TO_CHECK_SIZE, MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY
 
 
 class DataProcessor(BaseService):
@@ -51,19 +51,23 @@ class DataProcessor(BaseService):
         return aggregated_scroll_results
 
     def _get_previous_day_snapshot(self, date) -> Dict[str, dict]:
-        _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)
-        year, month, day = _date.strftime("%Y-%m-%d").split('-')
-        file_name: str = f"{self.category}-{LISTINGS.SNAPSHOT}-{year}-{month}-{day}.jsonl.gz"
-        s3_conn.download_file(file_name, 1)
-        time.sleep(2)
-        _input = gzip.GzipFile(file_name, "rb")
-        previous_day_snapshot: Dict[str, dict] = {}
-        for line in _input.readlines():
-            record = json.loads(line)
-            previous_day_snapshot[record["adId"]] = record
-        stdout_log.info(f"Previous snapshot successfully collected.")
-
-        return previous_day_snapshot
+        # MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY is handling missing snapshot from previous day or days.
+        for days_in_past in range(1, MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY):
+            try:
+                _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)
+                year, month, day = _date.strftime("%Y-%m-%d").split('-')
+                file_name: str = f"{self.category}-{LISTINGS.SNAPSHOT}-{year}-{month}-{day}.jsonl.gz"
+                s3_conn.download_file(file_name, 1)
+                time.sleep(2)
+                _input = gzip.GzipFile(file_name, "rb")
+                previous_day_snapshot: Dict[str, dict] = {}
+                for line in _input.readlines():
+                    record = json.loads(line)
+                    previous_day_snapshot[record["adId"]] = record
+                stdout_log.info(f"Previous snapshot successfully collected.")
+                return previous_day_snapshot
+            except Exception as e:
+                stdout_log.error(e)
 
     def _get_deduplicated_scroll_results(self):
         """Func is doing a deduplication of the aggregated scroll results for all cities and loads it to the list.

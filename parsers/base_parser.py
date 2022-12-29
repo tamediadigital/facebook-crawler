@@ -17,11 +17,12 @@ class Parser(ABC):
     def _regex_search_between(page_content: str, first_pair: str, second_pair: str):
         return regex_search_between(page_content, first_pair, second_pair)
 
-    def _parse_title(self, page_content: str):
+    def _parse_title(self, page_content: str, ad_id):
         title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
                      self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
                      self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
                      self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"') or \
+                     self._regex_search_between(page_content, '"marketplace_listing_title":"', f'","id":"{ad_id}"') or \
                      self._regex_search_between(page_content, '"meta":{"title":"', ' - Cars & Trucks') or \
                      self._regex_search_between(page_content, '"meta":{"title":"', ' - Miscellaneous') or \
                      self._regex_search_between(page_content, '"meta":{"title":"', ' - Property Rentals') or \
