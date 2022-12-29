@@ -54,10 +54,10 @@ class DataProcessor(BaseService):
         # MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY is handling missing snapshot from previous day or days.
         for days_in_past in range(1, MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY):
             try:
-                _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=1)
+                _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=days_in_past)
                 year, month, day = _date.strftime("%Y-%m-%d").split('-')
                 file_name: str = f"{self.category}-{LISTINGS.SNAPSHOT}-{year}-{month}-{day}.jsonl.gz"
-                s3_conn.download_file(file_name, 1)
+                s3_conn.download_file(file_name, days_in_past)
                 time.sleep(2)
                 _input = gzip.GzipFile(file_name, "rb")
                 previous_day_snapshot: Dict[str, dict] = {}
