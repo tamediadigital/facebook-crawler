@@ -2,7 +2,7 @@ import json
 
 from abc import ABC
 from typing import List
-from utils import stdout_log, regex_search_between
+from utils import stdout_log, regex_search_between, title_regex_search_between
 
 
 class Parser(ABC):
@@ -17,16 +17,25 @@ class Parser(ABC):
     def _regex_search_between(page_content: str, first_pair: str, second_pair: str):
         return regex_search_between(page_content, first_pair, second_pair)
 
+    @staticmethod
+    def _regex_search_between_title (page_content: str, first_pair: str, second_pair: str):
+        return title_regex_search_between(page_content, first_pair, second_pair)
+
     def _parse_title(self, page_content: str, ad_id):
-        title: str = self._regex_search_between(page_content, '"marketplace_listing_title":"', '","condition"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","inventory_count"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_pending"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', '","is_live"') or \
-                     self._regex_search_between(page_content, '"marketplace_listing_title":"', f'","id":"{ad_id}"') or \
-                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Cars & Trucks') or \
-                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Miscellaneous') or \
-                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Property Rentals') or \
-                     self._regex_search_between(page_content, '"meta":{"title":"', ' - Property For Sale')
+        title: str = self._regex_search_between_title(page_content, '"base_marketplace_listing_title":"',
+                                                      f'","marketplace_listing_title"') or \
+                     self._regex_search_between_title(page_content, '"marketplace_listing_title":"',
+                                                      f'","id":"{ad_id}",') or \
+                     self._regex_search_between_title(page_content, '"marketplace_listing_title":"', '","condition"') or \
+                     self._regex_search_between_title(page_content, '"marketplace_listing_title":"',
+                                                      '","inventory_count"') or \
+                     self._regex_search_between_title(page_content, '"marketplace_listing_title":"',
+                                                      '","is_pending"') or \
+                     self._regex_search_between_title(page_content, '"marketplace_listing_title":"', '","is_live"') or \
+                     self._regex_search_between_title(page_content, '"meta":{"title":"', ' - Cars & Trucks') or \
+                     self._regex_search_between_title(page_content, '"meta":{"title":"', ' - Miscellaneous') or \
+                     self._regex_search_between_title(page_content, '"meta":{"title":"', ' - Property Rentals') or \
+                     self._regex_search_between_title(page_content, '"meta":{"title":"', ' - Property For Sale')
 
         if not title:
             return "No title found with regex!"
