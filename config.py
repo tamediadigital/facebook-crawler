@@ -60,12 +60,20 @@ REDIS_HOST: str = os.environ.get("REDIS_HOST")
 REDIS_PORT: int = int(os.environ.get("REDIS_PORT"))
 REDIS_DB: int = int(os.environ.get("REDIS_DB"))
 
-SOCIAL_PROXY_USERNAME: str = os.environ.get("SOCIAL_PROXY_USERNAME")
-SOCIAL_PROXY_PASS: str = os.environ.get("SOCIAL_PROXY_PASS")
-SOCIAL_PROXY_SERVER: str = os.environ.get("SOCIAL_PROXY_SERVER")
+# PROXY SETUP
+PROXY_REGION: str = os.environ.get("PROXY_REGION") if os.environ.get("PROXY_REGION") else "AU"
 SOCIAL_PROXY_KEY: str = os.environ.get("SOCIAL_PROXY_KEY")
 SOCIAL_PROXY_SECRET: str = os.environ.get("SOCIAL_PROXY_SECRET")
-SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR")
+if PROXY_REGION == "AU":
+    SOCIAL_PROXY_USERNAME: str = os.environ.get("SOCIAL_PROXY_USERNAME")
+    SOCIAL_PROXY_PASS: str = os.environ.get("SOCIAL_PROXY_PASS")
+    SOCIAL_PROXY_SERVER: str = os.environ.get("SOCIAL_PROXY_SERVER")
+    SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR")
+else:
+    SOCIAL_PROXY_USERNAME: str = os.environ.get("SOCIAL_PROXY_USERNAME_UK")
+    SOCIAL_PROXY_PASS: str = os.environ.get("SOCIAL_PROXY_PASS_UK")
+    SOCIAL_PROXY_SERVER: str = "london1.thesocialproxy.com:10000"
+    SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR_UK")
 
 DATE: str = os.environ.get("DATE")
 if not DATE:

@@ -13,14 +13,14 @@ if __name__ == '__main__':
                          SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR)
 
     # Scroll step
-    # scroll_parser = ScrollParser()
-    # ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
+    scroll_parser = ScrollParser()
+    ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
 
     # Data processing step
-    # data_processor = DataProcessor(CATEGORY_TO_PROCESS)
-    # listing_not_to_check = data_processor.listings_to_check()
-    # data_processor.delta_listings()
-    # overlap_listings = data_processor.overlap_listings()
+    data_processor = DataProcessor(CATEGORY_TO_PROCESS)
+    listing_not_to_check = data_processor.listings_to_check()
+    data_processor.delta_listings()
+    overlap_listings = data_processor.overlap_listings()
 
     # Paginate delta listings step.
     if CATEGORY_TO_PROCESS in ["vehicle", "cars"]:
@@ -32,11 +32,11 @@ if __name__ == '__main__':
     delta_listings: List[dict] = details_crawler.pagination_process()
 
     # Check listing availability step.
-    # if CATEGORY_TO_PROCESS != "vehicle":
-    #     availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
-    #     available_listings: List[dict] = availability_crawler.availability_check_process()
-    # else:
-    #     available_listings = data_processor.listings_to_check()
+    if CATEGORY_TO_PROCESS != "vehicle":
+        availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
+        available_listings: List[dict] = availability_crawler.availability_check_process()
+    else:
+        available_listings = data_processor.listings_to_check()
 
     # Make snapshot step.
-    # data_processor.make_snapshot(delta_listings, available_listings, overlap_listings, listing_not_to_check)
+    data_processor.make_snapshot(delta_listings, available_listings, overlap_listings, listing_not_to_check)
