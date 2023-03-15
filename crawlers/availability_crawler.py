@@ -1,6 +1,7 @@
-import random
 import time
+import random
 
+from typing import List
 from config import DATE
 from datetime import datetime
 from playwright.sync_api import sync_playwright
@@ -8,9 +9,9 @@ from utils import Proxy, BaseService, stdout_log, retry, LISTINGS, regex_search_
 
 
 class AvailabilityCrawler(BaseService):
-    def __init__(self, proxy: Proxy, category: str):
+    def __init__(self, proxies: List[Proxy], category: str):
         super().__init__()
-        self.proxy = proxy
+        self.proxies = proxies
         self.category = category
         self.items_to_check = self._read_file(LISTINGS.TO_CHECK, category)
         self.available_items = []
@@ -44,20 +45,23 @@ class AvailabilityCrawler(BaseService):
             self.items_to_check = redis_items_to_check
         _items_to_check: list = self.items_to_check.copy()
 
+        proxy_list_len = len(self.proxies) - 1
+        proxy_switch = 0
         while True:
             chunk_from = self.listings_num_per_proxy * i + executed_chunk_items
             stdout_log.info(f"chunk_from: {chunk_from}")
             chunk_to = self.listings_num_per_proxy * (i + 1)
             stdout_log.info(f"chunk_to: {chunk_to}")
+            stdout_log.info(f"proxy: {self.proxies[proxy_switch].server}")
 
             items_to_check: list = self.items_to_check[chunk_from:chunk_to]
             if not _items_to_check:
                 break
 
             browser = playwright.firefox.launch(headless=True, proxy={
-                "server": self.proxy.server,
-                "username": self.proxy.username,
-                "password": self.proxy.password
+                "server": self.proxies[proxy_switch].server,
+                "username": self.proxies[proxy_switch].username,
+                "password": self.proxies[proxy_switch].password
                 })
             i_context = browser.new_context()
 
@@ -108,7 +112,11 @@ class AvailabilityCrawler(BaseService):
             browser.close()
 
             # Call rotate proxy.
-            self.proxy.rotate_proxy_call()
+            self.proxies[proxy_switch].rotate_proxy_call()
+            if proxy_switch == proxy_list_len:
+                proxy_switch = 0
+            else:
+                proxy_switch += 1
 
         file_name: str = f"{self.category}-{LISTINGS.AVAILABLE}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.available_items)

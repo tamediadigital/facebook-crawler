@@ -60,20 +60,20 @@ REDIS_HOST: str = os.environ.get("REDIS_HOST")
 REDIS_PORT: int = int(os.environ.get("REDIS_PORT"))
 REDIS_DB: int = int(os.environ.get("REDIS_DB"))
 
-# PROXY SETUP
-PROXY_REGION: str = os.environ.get("PROXY_REGION") if os.environ.get("PROXY_REGION") else "AU"
-SOCIAL_PROXY_KEY: str = os.environ.get("SOCIAL_PROXY_KEY")
-SOCIAL_PROXY_SECRET: str = os.environ.get("SOCIAL_PROXY_SECRET")
-if PROXY_REGION == "AU":
-    SOCIAL_PROXY_USERNAME: str = os.environ.get("SOCIAL_PROXY_USERNAME")
-    SOCIAL_PROXY_PASS: str = os.environ.get("SOCIAL_PROXY_PASS")
-    SOCIAL_PROXY_SERVER: str = os.environ.get("SOCIAL_PROXY_SERVER")
-    SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR")
-else:
-    SOCIAL_PROXY_USERNAME: str = os.environ.get("SOCIAL_PROXY_USERNAME_UK")
-    SOCIAL_PROXY_PASS: str = os.environ.get("SOCIAL_PROXY_PASS_UK")
-    SOCIAL_PROXY_SERVER: str = "london1.thesocialproxy.com:10000"
-    SOCIAL_PROXY_B64_STR: str = os.environ.get("SOCIAL_PROXY_B64_STR_UK")
+# PROXIES SETUP
+PROXIES_LIST: list = os.environ.get("PROXIES_LIST").split('-') if os.environ.get("PROXIES_LIST") else ["AU"]
+PROXY_CREDS_MAP = {
+    "SOCIAL_PROXY_KEY": os.environ.get("SOCIAL_PROXY_KEY"),
+    "SOCIAL_PROXY_SECRET": os.environ.get("SOCIAL_PROXY_SECRET"),
+    "SOCIAL_PROXY_USERNAME_AU": os.environ.get("SOCIAL_PROXY_USERNAME"),
+    "SOCIAL_PROXY_PASS_AU": os.environ.get("SOCIAL_PROXY_PASS"),
+    "SOCIAL_PROXY_SERVER_AU": os.environ.get("SOCIAL_PROXY_SERVER"),
+    "SOCIAL_PROXY_B64_STR_AU": os.environ.get("SOCIAL_PROXY_B64_STR"),
+    "SOCIAL_PROXY_USERNAME_UK": os.environ.get("SOCIAL_PROXY_USERNAME_UK"),
+    "SOCIAL_PROXY_PASS_UK": os.environ.get("SOCIAL_PROXY_PASS_UK"),
+    "SOCIAL_PROXY_SERVER_UK": "london1.thesocialproxy.com:10000",
+    "SOCIAL_PROXY_B64_STR_UK": os.environ.get("SOCIAL_PROXY_B64_STR_UK"),
+    }
 
 DATE: str = os.environ.get("DATE")
 if not DATE:

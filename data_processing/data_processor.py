@@ -1,13 +1,12 @@
+import os
 import csv
 import gzip
-import itertools
 import json
-import os
 import time
+import itertools
 
-from datetime import datetime, timedelta
 from typing import List, Dict
-from db.s3_conn import s3_conn
+from datetime import datetime, timedelta
 from utils import BaseService, stdout_log, slack_message_via_alertina, CATEGORIES, LISTINGS
 from config import DATE, DEFAULT_REQUIRED_CITIES, LISTINGS_TO_CHECK_SIZE, MAX_DAYS_OF_MISSING_SNAPSHOT_FROM_PREVIOUS_DAY
 
@@ -40,7 +39,7 @@ class DataProcessor(BaseService):
         for city in DEFAULT_REQUIRED_CITIES:
             year, month, day = DATE.split('-')
             file_name: str = f"facebook-{self.category}-{city}-{year}-{month}-{day}.jsonl.gz"
-            s3_conn.download_file(file_name, per_city=True)
+            self.s3_conn.download_file(file_name, per_city=True)
             time.sleep(2)
             _input = gzip.GzipFile(file_name, "rb")
             for line in _input.readlines():
@@ -57,12 +56,14 @@ class DataProcessor(BaseService):
                 _date = datetime.strptime(date, '%Y-%m-%d') - timedelta(days=days_in_past)
                 year, month, day = _date.strftime("%Y-%m-%d").split('-')
                 file_name: str = f"{self.category}-{LISTINGS.SNAPSHOT}-{year}-{month}-{day}.jsonl.gz"
-                s3_conn.download_file(file_name, days_in_past)
+                self.s3_conn.download_file(file_name, days_in_past)
                 time.sleep(2)
                 _input = gzip.GzipFile(file_name, "rb")
                 previous_day_snapshot: Dict[str, dict] = {}
+                new_crawl_datetime = str(datetime.strptime(date, '%Y-%m-%d'))
                 for line in _input.readlines():
                     record = json.loads(line)
+                    record['crawlDatetime'] = new_crawl_datetime
                     previous_day_snapshot[record["adId"]] = record
                 stdout_log.info(f"Previous snapshot successfully collected.")
                 return previous_day_snapshot

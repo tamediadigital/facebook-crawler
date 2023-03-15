@@ -1,20 +1,21 @@
 from typing import List
 
-from crawlers import ScrollCrawler, DetailsCrawler, AvailabilityCrawler
+
 from data_processing import DataProcessor
+from config import CATEGORY_TO_PROCESS, DATE
+from utils import stdout_log, prepare_proxies
 from parsers import ScrollParser, AutomotiveParser, PropertyParser
-from utils import Proxy
-from config import SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS, SOCIAL_PROXY_KEY, \
-    SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR, CATEGORY_TO_PROCESS
+from crawlers import ScrollCrawler, DetailsCrawler, AvailabilityCrawler
 
 
 if __name__ == '__main__':
-    proxy: Proxy = Proxy(SOCIAL_PROXY_SERVER, SOCIAL_PROXY_USERNAME, SOCIAL_PROXY_PASS, SOCIAL_PROXY_KEY,
-                         SOCIAL_PROXY_SECRET, SOCIAL_PROXY_B64_STR)
+    stdout_log.info(f"DATE: {DATE}")
+    # Prepare proxies
+    proxies = prepare_proxies()
 
     # Scroll step
     scroll_parser = ScrollParser()
-    ScrollCrawler(proxy, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
+    ScrollCrawler(proxies, scroll_parser, CATEGORY_TO_PROCESS).scrolling_process()
 
     # Data processing step
     data_processor = DataProcessor(CATEGORY_TO_PROCESS)
@@ -28,12 +29,12 @@ if __name__ == '__main__':
     else:
         delta_listings_parser = PropertyParser()
 
-    details_crawler = DetailsCrawler(proxy, delta_listings_parser, CATEGORY_TO_PROCESS)
+    details_crawler = DetailsCrawler(proxies, delta_listings_parser, CATEGORY_TO_PROCESS)
     delta_listings: List[dict] = details_crawler.pagination_process()
 
     # Check listing availability step.
     if CATEGORY_TO_PROCESS != "vehicle":
-        availability_crawler = AvailabilityCrawler(proxy, CATEGORY_TO_PROCESS)
+        availability_crawler = AvailabilityCrawler(proxies, CATEGORY_TO_PROCESS)
         available_listings: List[dict] = availability_crawler.availability_check_process()
     else:
         available_listings = data_processor.listings_to_check()

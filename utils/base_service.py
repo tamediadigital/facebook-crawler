@@ -29,9 +29,8 @@ class BaseService:
         stdout_log.info(f"File -> {file_name} successfully created.")
         stdout_log.info(f"File len -> {len(listings)}.")
 
-    @staticmethod
-    def _upload_file(file_name: str, per_city: bool):
-        s3_conn.upload_file(file_name, per_city)
+    def _upload_file(self, file_name: str, per_city: bool):
+        self.s3_conn.upload_file(file_name, per_city)
         stdout_log.info(f"File -> {file_name} successfully uploaded on S3.")
 
     def _create_and_upload_file(self, file_name: str, listings: List[dict], per_city=False):

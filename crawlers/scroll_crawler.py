@@ -10,7 +10,7 @@ from config import CITIES_CITIES_CODE_MAP, DATE, REQUIRED_CITIES, PRICE_COMBINAT
 
 
 class ScrollCrawler(BaseService):
-    def __init__(self, proxy: Proxy, parser: Parser, category_to_scroll: str):
+    def __init__(self, proxies: List[Proxy], parser: Parser, category_to_scroll: str):
         super().__init__()
         required_cities_list = REQUIRED_CITIES.copy()
         price_combinations_list = PRICE_COMBINATIONS.copy()
@@ -32,11 +32,10 @@ class ScrollCrawler(BaseService):
         self.redis_client.insert_into_redis(required_cities_list, key=self.redis_key_for_cities)
         self.redis_client.insert_into_redis(price_combinations_list, key=self.redis_key_for_prices)
         self.redis_client.insert_into_redis([], key=self.redis_key_for_items_for_city)
-        self.proxy = proxy
+        self.proxies = proxies
 
     @retry(TimeoutError, stdout_log)
     def scrolling_process(self):
-        stdout_log.info(f"type={type(self.proxy.server)}, {self.proxy.server}")
         redis_required_cities: list = self.redis_client.get_mappings(key=self.redis_key_for_cities)
         if redis_required_cities:
             self.required_cities = redis_required_cities
@@ -55,12 +54,16 @@ class ScrollCrawler(BaseService):
 
             city_code: str = CITIES_CITIES_CODE_MAP[city]
             un_crawled_prices: list = self.price_combinations.copy()
+
+            proxy_list_len = len(self.proxies) - 1
+            proxy_switch = 0
             for p_comb in self.price_combinations:
                 # Init browser and page per price combination.
+                stdout_log.info(f"proxy: {self.proxies[proxy_switch].server}")
                 browser = playwright.firefox.launch(headless=True, proxy={
-                    "server": self.proxy.server,
-                    "username": self.proxy.username,
-                    "password": self.proxy.password
+                    "server": self.proxies[proxy_switch].server,
+                    "username": self.proxies[proxy_switch].username,
+                    "password": self.proxies[proxy_switch].password
                     })
                 page = browser.new_page()
 
@@ -143,7 +146,11 @@ class ScrollCrawler(BaseService):
                 time.sleep(0.5)
 
                 # Call rotate proxy.
-                self.proxy.rotate_proxy_call()
+                self.proxies[proxy_switch].rotate_proxy_call()
+                if proxy_switch == proxy_list_len:
+                    proxy_switch = 0
+                else:
+                    proxy_switch += 1
                 time.sleep(5)
 
             parsed_items_for_city: list = list(itertools.chain.from_iterable(_parsed_items_for_city))

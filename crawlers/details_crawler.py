@@ -1,17 +1,18 @@
 import time
 import random
 
+from config import DATE
+from typing import List
+from parsers import Parser
 from playwright.sync_api import sync_playwright
 from utils import BaseService, Proxy, stdout_log, retry, LISTINGS
-from parsers import Parser
-from config import DATE
 
 
 class DetailsCrawler(BaseService):
 
-    def __init__(self, proxy: Proxy, parser: Parser, category: str):
+    def __init__(self, proxies: List[Proxy], parser: Parser, category: str):
         super().__init__()
-        self.proxy = proxy
+        self.proxies = proxies
         self.parser = parser
         self.category = category
         self.items_to_paginate = self._read_file(LISTINGS.DELTA, category)
@@ -30,20 +31,23 @@ class DetailsCrawler(BaseService):
             self.items_to_paginate = redis_items_to_paginate
         _items_to_paginate: list = self.items_to_paginate.copy()
 
+        proxy_list_len = len(self.proxies) - 1
+        proxy_switch = 0
         while True:
             chunk_from = self.listings_num_per_proxy * i + executed_chunk_items
             stdout_log.info(f"chunk_from: {chunk_from}")
             chunk_to = self.listings_num_per_proxy * (i + 1)
             stdout_log.info(f"chunk_to: {chunk_to}")
+            stdout_log.info(f"proxy: {self.proxies[proxy_switch].server}")
 
             items_to_paginate: list = self.items_to_paginate[chunk_from:chunk_to]
             if not _items_to_paginate:
                 break
 
             browser = playwright.firefox.launch(headless=True, proxy={
-                "server": self.proxy.server,
-                "username": self.proxy.username,
-                "password": self.proxy.password
+                "server": self.proxies[proxy_switch].server,
+                "username": self.proxies[proxy_switch].username,
+                "password": self.proxies[proxy_switch].password
                 })
             i_context = browser.new_context()
             page = i_context.new_page()
@@ -92,7 +96,11 @@ class DetailsCrawler(BaseService):
             browser.close()
 
             # Call rotate proxy.
-            self.proxy.rotate_proxy_call()
+            self.proxies[proxy_switch].rotate_proxy_call()
+            if proxy_switch == proxy_list_len:
+                proxy_switch = 0
+            else:
+                proxy_switch += 1
 
         file_name: str = f"{self.category}-{LISTINGS.PAGINATED_DELTA}-{DATE}.jsonl.gz"
         self._create_and_upload_file(file_name, self.paginated_items)

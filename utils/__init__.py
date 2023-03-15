@@ -1,9 +1,9 @@
 __all__ = ['BaseService', 'stdout_log', 'Proxy', 'retry', 'slack_message_via_alertina', 'CATEGORIES', 'LISTINGS',
-           'regex_search_between', 'title_regex_search_between']
+           'regex_search_between', 'title_regex_search_between', 'prepare_proxies']
 
 from .base_service import BaseService
 from .logger import stdout_log
-from .proxy import Proxy
+from .proxy import Proxy, prepare_proxies
 from .retry_handler import retry
 from .aleritna import slack_message_via_alertina
 from .const import CATEGORIES, LISTINGS
