@@ -34,7 +34,7 @@ class ScrollCrawler(BaseService):
         self.redis_client.insert_into_redis([], key=self.redis_key_for_items_for_city)
         self.proxies = proxies
 
-    @retry(TimeoutError, stdout_log)
+    @retry(TimeoutError, stdout_log, tries=10)
     def scrolling_process(self):
         redis_required_cities: list = self.redis_client.get_mappings(key=self.redis_key_for_cities)
         if redis_required_cities:
@@ -137,7 +137,7 @@ class ScrollCrawler(BaseService):
                     browser.close()
                     time.sleep(2)
                     playwright.stop()
-                    time.sleep(15*60)
+                    time.sleep(5*60)
                     raise TimeoutError()
 
                 page.close()
