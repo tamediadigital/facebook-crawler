@@ -32,10 +32,10 @@ class ScrollParser(Parser):
                 url: str = f"https://www.facebook.com{_item_url}"
                 _id: str = _item_url.split("item/")[1].strip()
             except IndexError as e:
-                stdout_log.error(e)
+                # stdout_log.error(e)
                 continue
             except AttributeError as e:
-                stdout_log.error(e)
+                # stdout_log.error(e)
                 continue
 
             try:
@@ -50,10 +50,10 @@ class ScrollParser(Parser):
                 city: str = item_location_splited[0]
                 canton_code: str = item_location_splited[1].strip()
             except IndexError as e:
-                stdout_log.error(e)
+                # stdout_log.error(e)
                 continue
             except AttributeError as e:
-                stdout_log.error(e)
+                # stdout_log.error(e)
                 continue
 
             parsed_items.append(RecordFromScroll(adId=_id, url=url, price=price, city=city, cantonCode=canton_code).dict())
