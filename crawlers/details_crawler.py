@@ -61,10 +61,10 @@ class DetailsCrawler(BaseService):
                     page.goto(url, wait_until="load", timeout=90000)
                     time.sleep(random.choice(self.page_timeout_paginating_pool))
                     if not cookie_accepted and "next" not in page.url:
-                        # Allow essential cookies step.
-                        page.click("span:text('Only allow essential cookies')")
+                        # Cookies step.
+                        page.click("span:text('Decline optional cookies')")
                         time.sleep(2)
-                        stdout_log.info("Essential cookies step completed.")
+                        stdout_log.info("Cookies step completed.")
                         cookie_accepted = True
 
                     # Not alive listing url example: "https://www.facebook.com/?next=%2Fmarketplace%2F"
