@@ -78,10 +78,10 @@ class ScrollCrawler(BaseService):
                     page.goto(start_url, wait_until="load", timeout=90000)
                     time.sleep(5)
 
-                    # Allow essential cookies step.
-                    page.click("span:text('Only allow essential cookies')")
+                    # Cookies step.
+                    page.click("span:text('Decline optional cookies')")
                     time.sleep(2)
-                    stdout_log.info("Essential cookies step completed.")
+                    stdout_log.info("Cookies step completed.")
                     stdout_log.info(f"PAGE ON URL: {page.url}")
 
                     if self.cat_to_scroll == CATEGORIES.VEHICLE:
