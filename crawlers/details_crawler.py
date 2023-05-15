@@ -1,10 +1,10 @@
 import time
 import random
 
-from config import DATE
 from typing import List
 from parsers import Parser
 from playwright.sync_api import sync_playwright
+from config import DATE, ERROR_TOLERANCE_DETAILS_CRAWLER
 from utils import BaseService, Proxy, stdout_log, retry, LISTINGS
 
 
@@ -21,7 +21,7 @@ class DetailsCrawler(BaseService):
         self.redis_client.insert_into_redis([item for item in self.items_to_paginate],
                                             key=self.redis_key_for_urls_to_paginate)
 
-    @retry(TimeoutError, stdout_log)
+    @retry(TimeoutError, stdout_log, tries=ERROR_TOLERANCE_DETAILS_CRAWLER)
     def pagination_process(self):
         playwright = sync_playwright().start()
         i = 0
