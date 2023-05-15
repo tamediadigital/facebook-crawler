@@ -6,7 +6,8 @@ from typing import List
 from parsers import Parser
 from playwright.sync_api import sync_playwright
 from utils import BaseService, Proxy, stdout_log, retry, CATEGORIES
-from config import CITIES_CITIES_CODE_MAP, DATE, REQUIRED_CITIES, PRICE_COMBINATIONS, MAX_PAGE_HEIGHT
+from config import CITIES_CITIES_CODE_MAP, DATE, REQUIRED_CITIES, PRICE_COMBINATIONS, MAX_PAGE_HEIGHT, \
+    ERROR_TOLERANCE_SCROLL_CRAWLER
 
 
 class ScrollCrawler(BaseService):
@@ -34,7 +35,7 @@ class ScrollCrawler(BaseService):
         self.redis_client.insert_into_redis([], key=self.redis_key_for_items_for_city)
         self.proxies = proxies
 
-    @retry(TimeoutError, stdout_log, tries=10)
+    @retry(TimeoutError, stdout_log, tries=ERROR_TOLERANCE_SCROLL_CRAWLER)
     def scrolling_process(self):
         redis_required_cities: list = self.redis_client.get_mappings(key=self.redis_key_for_cities)
         if redis_required_cities:
@@ -137,7 +138,7 @@ class ScrollCrawler(BaseService):
                     browser.close()
                     time.sleep(2)
                     playwright.stop()
-                    time.sleep(5*60)
+                    time.sleep(2*60)
                     raise TimeoutError()
 
                 page.close()

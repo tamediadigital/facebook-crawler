@@ -4,7 +4,7 @@ import random
 from typing import List
 from datetime import datetime
 from playwright.sync_api import sync_playwright
-from config import DATE, PROXIES_BANNED_THRESHOLD
+from config import DATE, PROXIES_BANNED_THRESHOLD, ERROR_TOLERANCE_AVAILABILITY_CRAWLER
 from utils import Proxy, BaseService, stdout_log, retry, LISTINGS, regex_search_between, \
     slack_alert_when_proxy_is_blocked
 
@@ -39,7 +39,7 @@ class AvailabilityCrawler(BaseService):
             return True
         return False
 
-    @retry(TimeoutError, stdout_log)
+    @retry(TimeoutError, stdout_log, tries=ERROR_TOLERANCE_AVAILABILITY_CRAWLER)
     def availability_check_process(self):
         playwright = sync_playwright().start()
         i = 0
