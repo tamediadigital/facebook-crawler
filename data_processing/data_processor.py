@@ -101,7 +101,7 @@ class DataProcessor(BaseService):
 
         listings_len = len(not_found_listings)
         listings_num_to_slice = LISTINGS_TO_CHECK_SIZE if listings_len > LISTINGS_TO_CHECK_SIZE else listings_len
-        sorted_listings = sorted(not_found_listings, key=lambda d: d['last_check'], reverse=True)
+        sorted_listings = sorted(not_found_listings, key=lambda d: d['last_check'], reverse=False)
         listings_to_check = sorted_listings[:listings_num_to_slice]
         listings_not_to_check = sorted_listings[listings_num_to_slice:]
 
