@@ -130,7 +130,6 @@ class DataProcessor(BaseService):
         return overlap_listings
 
     def make_snapshot(self, delta_listings, checked_listings, overlap_listings, listing_not_to_check):
-        checked_listings = [self.previous_day_snapshot[item["adId"]] for item in checked_listings]
         snapshot_listings = list(itertools.chain.from_iterable([delta_listings, checked_listings, overlap_listings,
                                                                 listing_not_to_check]))
         self._create_and_upload_file(f"{self.category}-{LISTINGS.SNAPSHOT}-{DATE}.jsonl.gz", snapshot_listings)
