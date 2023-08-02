@@ -73,9 +73,8 @@ class AutomotiveParser(Parser):
         record.isBoosted = self._parse_is_boosted(page_content)
 
         if self._parse_seller(page_content):
-            seller_id, seller_name, seller_type = self._parse_seller(page_content)
+            seller_id, seller_type = self._parse_seller(page_content)
             record.sellerId = seller_id
-            record.sellerName = seller_name
             record.sellerType = seller_type
 
         record.condition = self._parse_condition(page_content)

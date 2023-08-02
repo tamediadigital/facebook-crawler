@@ -19,7 +19,6 @@ class BaseRecord(BaseModel):
     availableFrom: str = None
     isBoosted: str = None
     sellerId: str = None
-    sellerName: str = None
     sellerType: str = None
     last_check: str = str(datetime.now())
 
