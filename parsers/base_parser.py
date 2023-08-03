@@ -54,11 +54,10 @@ class Parser(ABC):
         try:
             seller_data = json.loads(res)
             seller_id = seller_data[0]["id"]
-            seller_name = seller_data[0]["name"]
             seller_type = seller_data[0]["__typename"]
         except [IndexError, KeyError]:
             return
-        return seller_id, seller_name, seller_type
+        return seller_id, seller_type
 
     def _parse_image_links(self, page_content: str):
         res = self._regex_search_between(page_content, '"listing_photos":', ',"pre_recorded_videos"')
