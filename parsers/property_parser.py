@@ -1,8 +1,10 @@
-import json
 import re
+import json
 
-from datetime import datetime, timedelta
+from typing import Union
+from utils import stdout_log
 from parsers.base_parser import Parser
+from datetime import datetime, timedelta
 from schemas.property_schemas import PropertyForSale, PropertyForRent
 
 
@@ -58,7 +60,16 @@ class PropertyParser(Parser):
                         pdp_fields[dict_1['icon_name']] = dict_1['display_label']
         return pdp_fields
 
-    def parse_item(self, page_content, scroll_record, category: str) -> dict:
+    def _parse_description(self, page_content: str):
+        description: str = self._regex_search_between(page_content, '"redacted_description":{"text":"', '"},"__isMarketplaceRealEstateListing"')
+        return description
+
+    def parse_item(self, page_content, scroll_record, category: str) -> Union[dict, None]:
+        # If property is rented we should not consider it as alive and present on the platform.
+        if 'dir="auto">Rented</span>' in page_content:
+            stdout_log.info("Listing is Sold!")
+            return
+
         if category == "propertyrentals":
             record = PropertyForRent(**scroll_record)
         else:
