@@ -62,6 +62,10 @@ class AutomotiveParser(Parser):
         vehicle_transmission_type = _vehicle_transmission_type.replace('"', '').lower() if _vehicle_transmission_type != "null" and _vehicle_transmission_type is not None else None
         return vehicle_transmission_type
 
+    def _parse_description(self, page_content: str):
+        description: str = self._regex_search_between(page_content, '"redacted_description":{"text":"', '"},"creation_time"')
+        return description
+
     def parse_item(self, page_content, scroll_record, category: str) -> dict:
         record = AutomotiveRecord(**scroll_record)
 

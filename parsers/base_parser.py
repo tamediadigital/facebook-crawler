@@ -45,10 +45,6 @@ class Parser(ABC):
             return
         return title
 
-    def _parse_description(self, page_content: str):
-        description: str = self._regex_search_between(page_content, '"redacted_description":{"text":"', '"},"creation_time"')
-        return description
-
     def _parse_seller(self, page_content: str):
         res = self._regex_search_between(page_content, '"actors":', ',"__isEntity"')
         try:
