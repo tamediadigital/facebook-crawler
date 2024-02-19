@@ -50,7 +50,6 @@ MAX_PAGE_HEIGHT = int(os.environ.get("MAX_PAGE_HEIGHT")) if os.environ.get("MAX_
 AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
-ALERTINA_APP_ID = os.environ.get("ALERTINA_APP_ID")
 ALERTINA_URL = os.environ.get("ALERTINA_URL")
 
 S3_BUCKET = os.environ.get("BUCKET_NAME")
