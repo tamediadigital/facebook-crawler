@@ -85,6 +85,11 @@ class ScrollCrawler(BaseService):
                     stdout_log.info("Cookies step completed.")
                     stdout_log.info(f"PAGE ON URL: {page.url}")
 
+                    # Exit login screen.
+                    page.click("div[aria-label='Close']")
+                    time.sleep(2)
+                    stdout_log.info("Exit login step completed.")
+
                     if self.cat_to_scroll == CATEGORIES.VEHICLE:
                         prices = p_comb.split("=")
                         min_price = prices[0]
